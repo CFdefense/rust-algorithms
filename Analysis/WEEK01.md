@@ -18,11 +18,12 @@ It takes O(V + E) aswell to compute the total in-degrees because in order to cou
 1. For each set of properties described below, draw an example graph (8-12 vertices is sufficient) either by hand (then submit a photo) or using a drawing/diagram app (e.g., drawio.com and then upload exported image).
 
     a. Undirected graph
+        ![Undirected Graph](Resources/Und_Graph.png)
 
     b. Directed acyclic graph
-
+        ![Undirected Graph](Resources/Dir_Graph.png)
     c. Weighted, directed graph with one or more cycles
-
+        ![Undirected Graph](Resources/Wei_Graph.png)
 2. For each one of the graphs you drew above, answer the following questions:
 
     a. Are the graphs you drew sparse or dense? Explain.
