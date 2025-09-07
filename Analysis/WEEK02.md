@@ -32,6 +32,17 @@ return nil
 
 ##### a. Annotate the psuedocode with the **costs** and **times**.
 
+```
+for i = 1 to A.length - 1       // c1 = n
+    minIndex = i                // c2 = n
+    for j=i to A.length         // c3 = (n(n-1))/2 -> Summation i=1 to n-1 (n-i-2)
+        if A[j] < A[minIndex]   // c4 = (n(n-1))/2
+            minIndex = j        // c5 = 0..(n(n-1))/2
+    tmp = A[i]                  // c6 = n
+    A[i] = A[minIndex]          // c7 = n
+    A[minIndex] = tmp           // c8 = n
+
+```
 
 ##### b. Selection Sort Loop Invariant
 
@@ -47,6 +58,13 @@ return nil
 #### 2. Consider the linear search algorithm again.
 
 ##### a. Annotate the psuedocode with **costs** and **times**
+
+```
+for i = 1 to n:         // c1 = 1..(n + 1)
+    if A[i] equals x    // c2 = 1..(n + 1) 
+        return i        // c3 = 0 or 1
+return nil              // c4 = 0 or 1
+```
 
 
 ##### b. How many elements in the input sequence need to be checked on average assuming that the element being searched for is equally likely to be anywhere in the array?
