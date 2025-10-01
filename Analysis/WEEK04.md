@@ -5,8 +5,31 @@
 ##### Write psuedocode for a recursive approach to Insertion Sort.
 
 ```
+insertionSort(array, n):
+    // Base Case: single element is already sorted
+    if n <= 1:
+        return
+
+    // Step 1: Recursively sort the first n-1 elements
+    insertionSort(array, n - 1)
+
+    // Step 2: Insert the nth element into the sorted subarray
+    key = array[n-1]
+    j = n - 2
+
+    while j >= 0 and array[j] > key:
+        array[j+1] = array[j]
+        j = j - 1
+
+    array[j+1] = key
 
 ```
+
+##### Worst Case Running Time:
+
+{O(1), n <=1; T(n-1) + O(n), n > 1}. 
+
+This scenerio occurs when every newly inserted element is compared against every existing element before being inserted ie: the input is reverse sorted.
 
 ### Chapter 20.3-2. Exercises:
 
