@@ -1,0 +1,6 @@
+[package]
+name = "dfs_edge_classification"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
