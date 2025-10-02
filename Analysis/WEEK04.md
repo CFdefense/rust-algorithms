@@ -35,9 +35,51 @@ This scenerio occurs when every newly inserted element is compared against every
 
 ##### Draw the graph from the main method of the attached DFS code and then show how depth-first search works on this graph. Assume that the for loop of lines 5-7 of the DFS procedure pseudocode considers the vertices in alphabetical order, and assume that each adjacency list is ordered alphabetically. Show the discovery and finish times for each vertex, and show the classification of every edge.
 
-```
+Adjacency (directed):
+
+- A: B, D
+- B: C, E
+- C: F
+- D: E, G
+- E: F, G
+- F: —
+- G: H
+- H: F
+
+Graph
 
 ```
+A ────→ B ─→ C ─→ F ←─┐ 
+|       |         ↑   |
+│       ↓         │   | 
+└→ D ─→ E ─→ G ─→ H   |
+   │    │    ↑        |
+   └─────────┘        |
+        └─────────────┘
+
+```
+
+DFS run (vertices considered A, B, C, D, E, F, G, H in order; each adjacency list is already alphabetical):
+
+Discovery/finish times (d/f):
+
+| Vertex | d  | f  |
+|-------:|---:|---:|
+| A      |  1 | 16 |
+| B      |  2 | 13 |
+| C      |  3 |  6 |
+| D      | 14 | 15 |
+| E      |  7 | 12 |
+| F      |  4 |  5 |
+| G      |  8 | 11 |
+| H      |  9 | 10 |
+
+Edge classification (directed):
+
+- Tree edges: A→B, B→C, C→F, B→E, E→G, G→H, A→D
+- Back edges: none
+- Forward edges: none
+- Cross edges: D→E, D→G, E→F, H→F
 
 ### Divide & Conquer:
 
