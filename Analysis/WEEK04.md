@@ -96,5 +96,75 @@ Brief explanation: at each level of recursion the array is split into two halves
 
 ###### T(n) = T(n/2) + n^3
 
+Recursion tree:
+
+```
+n^3
+ |
+(n/2)^3 = n^3/8
+ |
+(n/4)^3 = n^3/64
+ |
+...
+ |
+(n/2^L)^3 = n^3 / 8^L   where L = log_2 n
+ |
+ 1
+```
+
+Total cost:
+
+S = n^3 (1 + 1/8 + 1/8^2 + ... + 1/8^{log_2 n})
+
+Geometric series (ratio 1/8) ⇒ total Θ(n^3).
+
+T(n) = Θ(n^3).
+
+Substitution:
+
+Claim: T(n) <= c n^3 for some constant c >= 8/7 and large n.
+Base: For n <= n0 choose c large enough so the inequality holds.
+Inductive step: assume for all m < n, T(m) <= c m^3. Then
+
+T(n) = T(n/2) + n^3 <= c (n/2)^3 + n^3 = (c/8) n^3 + n^3.
+
+Require (c/8) n^3 + n^3 <= c n^3 ⇒ 1 <= c(1 - 1/8) = (7/8)c ⇒ c >= 8/7. 
+
+A lower bound T(n) >= n^3 gives T(n) = Θ(n^3).
+
 
 ###### T(n) = 4T(n/2) + n
+
+Recursion tree:
+
+```
+Level 0:                               [ n ]
+                                      /  |  |  \
+Level 1:                    [ n/2 ] [ n/2 ] [ n/2 ] [ n/2 ]
+                              /        |       |       \ 
+Level 2:           16 nodes total (4^2), each with cost [ n/4 ]
+                                        ...
+Level i:                4^i nodes, each with cost [ n / 2^i ]
+                                        ...
+Final level L = log_2 n: 4^L = n^2 leaves, each with cost [ 1 ]
+
+Per-level total cost: 4^i * (n/2^i) = n * 2^i, so the last level dominates at n * 2^{log_2 n} = n^2.
+```
+
+Substitution - upper:
+
+We prove T(n) <= c n^2 - k n for suitable constants c, k > 0 by induction.
+
+Base: Choose c, k so the inequality holds for small n (n <= n0).
+Inductive step: assume for m < n, T(m) <= c m^2 - k m. Then
+T(n) = 4 T(n/2) + n <= 4 (c (n/2)^2 - k (n/2)) + n = c n^2 - 2kn + n = c n^2 - (2k - 1)n.
+
+To get T(n) <= c n^2 - k n we need (2k - 1) >= k, i.e., k >= 1. Choose k = 1 and pick c large enough to satisfy the base cases; the induction goes through and yields an upper bound Θ(n^2).
+
+Substitution- lower:
+
+Assume T(n) >= d n^2 for some small d > 0. Then
+
+T(n) = 4 T(n/2) + n >= 4 d (n/2)^2 + n = d n^2 + n >= d n^2,
+
+Thus T(n) = Θ(n^2).
