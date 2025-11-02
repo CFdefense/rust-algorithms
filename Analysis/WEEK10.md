@@ -196,11 +196,92 @@ An example of such tree.
   2(B) 7(B)12(B)19(B)
 
 
-
-
 ### Chapter 13.3 Exercise
 
 ##### Show the red-black trees that result after successively inserting the keys 41, 38, 31, 12, 19, 8 into an initially empty red-black tree.
+
+# RB Tree Rules
+
+1. **Color Property**: Every node is either **Black** or **Red**.  
+2. **Root Property**: The root is always **Black**.  
+3. **Red Property**: No red node has a red child.  
+4. **Black-Height Property**: Every path from a node to its descendant leaves contains the same number of black nodes.  
+5. **Leaf Property**: All leaves (NIL/null nodes) are considered **Black**.
+
+1. Insert 41 (root must be Black)
+
+        41(B)
+
+2. Insert 38 (to left and as red)
+
+        41(B)
+       / 
+    38(R)
+
+3. Insert 31 (to left and as red)
+
+Violation: Two consecutive reds: Uncle is nil - Case 2.
+
+        41(B)
+       / 
+    38(R)
+     /
+    31(R)
+
+3a. Right Rotation on 41
+
+        38(B)
+       /    \
+    31(R)  41(R)
+
+4. Insert 12 (to left and as red)
+
+Violation: Two consecutive reds: Parent and Uncle Red - Case 1.
+
+        38(B)
+       /    \
+    31(R)  41(R)
+    /
+ 12(R)
+
+4a. Recolor Parent and Uncle Black, Grandparent Red (root so keep it black)
+
+        38(B)
+       /    \
+    31(B)  41(B)
+    /
+ 12(R)
+
+5. Insert 19 (left, right then as red)
+
+        38(B)
+       /    \
+    31(B)  41(B)
+    /   \
+ 12(R) 19(R)
+
+6. Insert 8 (left, left, left, then as red)
+
+Violation: Two consecutive reds: Parent and Uncle Red: Case 1
+
+        38(B)
+       /    \
+    31(B)  41(B)
+    /   \
+ 12(R) 19(R)
+  /
+8(R)
+
+6a. Recolor Parent and Uncle Black, Grandparent Red (root so keep it black)
+
+        38(B)
+       /    \
+    31(R)  41(B)
+    /   \
+ 12(B) 19(B)
+  /
+8(R)
+
 
 ### Chapter 13.4 Exercise
 
