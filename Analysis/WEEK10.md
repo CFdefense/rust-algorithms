@@ -4,6 +4,79 @@
 
 ##### For the set {1, 4, 5, 10, 16, 17, 21} of keys, draw binary search trees of heights 2, 3, 4, 5, and 6. Additionally for each tree you draw, propose a specific ordering of the keys that would result in the construction of that tree.
 
+###### Height 2
+
+        10
+       /  \
+      5    16
+     / \   / \
+    1   4 17 21
+
+Insertion Order: {10,5,16,1,4,17,21}
+
+###### Height 3
+
+       4
+      / \
+     1   10
+        /  \
+       5    17
+           /  \
+          16   21
+
+Insertion Order: {4,1,10,5,17,16,21}
+
+###### Height 4
+
+    1
+     \
+      4
+        \
+         10
+        /  \
+       5    17
+           /  \
+          16   21
+
+
+Insertion Order: {1,4,10,5,17,16,21}
+
+###### Height 5
+
+    1
+     \
+      4
+       \
+        5
+         \
+          10
+            \
+             17
+            /  \
+           16   21
+
+
+Insertion Order: {1,4,5,10,17,16,21}
+
+###### Height 6
+
+    1
+     \
+      4
+       \
+        5
+         \
+          10
+            \
+             16
+               \
+                17
+                  \
+                   21
+
+
+Insertion Order: {1,4,5,10,16,17,21}
+
 ##### What is the difference between the binary-search-tree property and the min-heap property of page 163? Can the min-heap property be used to print out the keys of an n-node tree in sorted order in O(n) time? Show how, or explain why not.
 
 ###### What is the difference between the binary-search-tree property and the min-heap property of page 163? 
