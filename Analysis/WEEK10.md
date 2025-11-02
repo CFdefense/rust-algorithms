@@ -306,6 +306,7 @@ Insert 1 (causes rotation to fix red–red violation):
              15(B)
 
 Delete 1: 
+
       5(B)
         \
         10(R)
