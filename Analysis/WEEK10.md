@@ -287,3 +287,29 @@ Violation: Two consecutive reds: Parent and Uncle Red: Case 1
 
 ##### A node x is inserted into a red-black tree with RB-INSERT and then is immediately deleted with RB-DELETE. Is the resulting red-black tree always the same as the initial red-black tree? Justify your answer.
 
+We cannot assume inserting a node into a red-black tree then removing it after will result in the same tree before we inserted the node. This is due to the fact that when we insert and delete, we must address tree violations, such as recolorings and rotations. These operations will result in modified trees. 
+
+**Example:**
+
+RB Tree:
+
+      10(B)
+     /    \
+   5(R)   15(B)
+
+Insert 1 (causes rotation to fix red–red violation):
+
+      5(B)
+     /    \
+   1(R)   10(R)
+             \
+             15(B)
+
+Delete 1: 
+      5(B)
+        \
+        10(R)
+          \
+          15(B)
+
+Final Tree Differs From The Original Due to Rotation.
