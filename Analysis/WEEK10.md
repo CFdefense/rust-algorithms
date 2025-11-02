@@ -81,9 +81,22 @@ Insertion Order: {1,4,5,10,16,17,21}
 
 ###### What is the difference between the binary-search-tree property and the min-heap property of page 163? 
 
+The Binary Search Tree property maintains that every node’s left subtree contains values less than or equal to the node, and its right subtree contains values greater than the node. This defers from the min-heap property which only says that a parent node should have a value less than or equal to its children. 
+
 ###### Can the min-heap property be used to print out the keys of an n-node tree in sorted order in O(n) time? (Note: Should be understood to include a requirement that the tree not be modified.)
 
+No we cannot guarantee that the min-heap property can be used to print out keys of an n-node tree in sorted order in O(n) time. This is because the min-heap property only ensures that the parent node is greater than its child nodes, it does not force a sorted ordering of the child nodes.
+
 ###### Show how, or explain why not.
+
+        1
+       / \
+      5   3
+     / \
+    8  10
+
+This example maintains the min-heap property but we see that child nodes 5 and 3 are not in sorted order while child nodes 8 and 10 are. 
+
 
 ### Chapter 12.2 Exercise 
 
@@ -96,14 +109,94 @@ b. B, the keys on the search path
 c. C, the keys to the right of the search path. 
 
 ###### Professor Kilmer claims that any three keys a in A, b in B, and c in C must satisfy a le b le c. Give a smallest possible counterexample to the professor's claim. (Note: Your counterexample should be in the form of a specific binary search tree T and key k.)
+       
+       10
+      /  \
+     5    15
+    / \
+   1   8
+
+Insertion Order: {10,5,15,1,8}
+
+Search for 1:
+
+Path A: {}
+Path B: {10,5,1}
+Path C: {8,15}
+
+Given the above key T, when searching for k: 1 - From set C's: 8 violates the property as it is less than set B's: 10.
+
 
 ### Chapter 12.3 Exercise 
 
 ##### Is the operation of deletion "commutative" in the sense that deleting x and then y from a binary search tree leaves the same tree as deleting y and then x? Argue why it is or give a counterexample.
 
+The deletion operation on a BST is commutative, this is due to deletion being deterministic based only on key comparisons, and each deletion depends only on the keys present at that moment.
+
+**Example:**
+
+Tree:
+      5
+     / \
+    3   8
+   / \
+  2   4
+
+**Case 1:**
+
+After Removing 3:
+
+    5
+   / \
+  4   8
+ /
+2
+
+After Removing 4:
+
+    5
+   / \
+  2   8
+
+**Case 2:**
+
+After Removing 4:
+
+    5
+   / \
+  3   8
+ /
+2
+
+After Removing 3:
+
+    5
+   / \
+  2   8
+
+
 ### Chapter 13.1 Exercise
 
 ##### Describe a red-black tree on n keys that realizes the largest possible ratio of red internal nodes to black internal nodes. What is this ratio? What tree has the smallest possible ratio, and what is the ratio?
+
+###### Describe a red-black tree on n keys that realizes the largest possible ratio of red internal nodes to black internal nodes. What is this ratio? 
+
+A perfectly balanced red–black tree where every black node has two red children (and red nodes have only black children). The maximum posible ratio of red internal nodes to black internal nodes is a 1:1 ratio. 
+
+###### What tree has the smallest possible ratio, and what is the ratio?
+
+The smallest possible ratio is 0: The situation where a RB tree has 0 red nodes.
+
+An example of such tree.
+
+        10(B)
+       /    \
+    6(B)    16(B)
+   /  \     /  \
+  2(B) 7(B)12(B)19(B)
+
+
+
 
 ### Chapter 13.3 Exercise
 
