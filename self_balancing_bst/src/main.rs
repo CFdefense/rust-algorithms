@@ -1,18 +1,26 @@
 use std::{
     fmt::{Display, Error, Formatter},
-    mem, vec,
+    vec,
 };
 
 pub struct TreeNode {
+    /*
+        A single node in the self-balancing BST.
+
+        Stores the `key`, cached sizes of left/right subtrees (`left_count`/`right_count`),
+        and child pointers. Counts are recomputed after structural updates.
+    */
     pub key: i32,
     pub left_count: i32,
     pub right_count: i32,
-    pub right_subtree: Vec<Box<TreeNode>>,
-    pub left_subtree: Vec<Box<TreeNode>>,
+    pub left: Option<Box<TreeNode>>,
+    pub right: Option<Box<TreeNode>>,
 }
 
 impl Display for TreeNode {
     /*
+       In rust we must implement the Display trait to be able to print a defined struct.
+
        Will print the tree node in a readable format.
 
        This allows us to print the tree node in a readable format with simply calling println!("{}", node);
@@ -20,20 +28,18 @@ impl Display for TreeNode {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         write!(
             f,
-            "TreeNode {{ key: {}, left_count: {}, right_count: {}, right_subtree: {}, left_subtree: {} }}",
+            "TreeNode {{ key: {}, left_count: {}, right_count: {}, left: {}, right: {}}}",
             self.key,
             self.left_count,
             self.right_count,
-            self.right_subtree
-                .iter()
+            self.left
+                .as_ref()
                 .map(|n| n.to_string())
-                .collect::<Vec<String>>()
-                .join("\n, "),
-            self.left_subtree
-                .iter()
+                .unwrap_or_else(|| "None".to_string()),
+            self.right
+                .as_ref()
                 .map(|n| n.to_string())
-                .collect::<Vec<String>>()
-                .join("\n"),
+                .unwrap_or_else(|| "None".to_string()),
         )
     }
 }
@@ -47,329 +53,453 @@ impl TreeNode {
             key,
             left_count: 0,
             right_count: 0,
-            right_subtree: Vec::new(),
-            left_subtree: Vec::new(),
+            left: None,
+            right: None,
         }
     }
 
-    fn collect_all_keys(&self) -> (Vec<i32>, Vec<i32>) {
+    fn subtree_size(node: &Option<Box<TreeNode>>) -> i32 {
         /*
-           Will collect all keys from the left and right subtrees.
+            Compute the total size of `node`'s subtree.
 
-           Returns a tuple of two vectors, one for the left subtree and one for the right subtree.
-
-           This is used to print the tree in a readable format.
+            This is used for display and verification; counts on nodes are updated
+            separately via `recompute_counts` on the owning tree.
         */
-        let mut left_keys = Vec::new();
-        let mut right_keys = Vec::new();
-
-        // Collect all keys from left subtree (including nested ones)
-        for node in &self.left_subtree {
-            left_keys.push(node.key);
-            let (nested_left, nested_right) = node.collect_all_keys();
-            // All nested keys are part of the left subtree
-            left_keys.extend(nested_left);
-            left_keys.extend(nested_right);
+        match node {
+            Some(n) => 1 + TreeNode::subtree_size(&n.left) + TreeNode::subtree_size(&n.right),
+            _ => 0,
         }
-
-        // Collect all keys from right subtree (including nested ones)
-        for node in &self.right_subtree {
-            right_keys.push(node.key);
-            let (nested_left, nested_right) = node.collect_all_keys();
-            // All nested keys are part of the right subtree
-            right_keys.extend(nested_left);
-            right_keys.extend(nested_right);
-        }
-
-        (left_keys, right_keys)
     }
 
-    fn get_predecessor_index(&self) -> Option<usize> {
+    fn bst_property_holds(&self) -> bool {
         /*
-           Will get the max node's index in the left subtree.
-
-           Ie: The node which comes right before the root node in an in-order traversal.
+            Verify the BST property holds for this node's subtree.
         */
-        self.left_subtree
-            .iter()
-            .enumerate()
-            .max_by_key(|(_, n)| n.key)
-            .map(|(idx, _)| idx)
-    }
-
-    fn get_successor_index(&self) -> Option<usize> {
-        /*
-           Will get the min node's index in the right subtree.
-
-           Ie: The node which comes right after the root node in an in-order traversal.
-        */
-        self.right_subtree
-            .iter()
-            .enumerate()
-            .min_by_key(|(_, n)| n.key)
-            .map(|(idx, _)| idx)
-    }
-
-    fn remove_from_subtree(subtree: &mut Vec<Box<TreeNode>>, key: i32) -> bool {
-        /*
-           Will remove the node with the given key from the subtree.
-
-           Returns true if the node was found and removed, false otherwise.
-
-           Tree is only 2 levels deep, so we can just iterate through the subtree and remove the node.
-        */
-        if let Some(idx) = subtree
-            .iter()
-            .enumerate()
-            .find(|(_, n)| n.key == key)
-            .map(|(idx, _)| idx)
-        {
-            subtree.remove(idx);
-            return true;
-        }
-
-        false
+        let left_ok = match &self.left {
+            Some(l) => l.key < self.key && l.bst_property_holds(),
+            _ => true,
+        };
+        let right_ok = match &self.right {
+            Some(r) => r.key > self.key && r.bst_property_holds(),
+            _ => true,
+        };
+        left_ok && right_ok
     }
 }
 
-pub struct SelfBalancingTree {
+pub struct BalancedTree {
+    /*
+        A BST that maintains balance by size-based root adjustments on insert/delete,
+        and recursive local rebalancing to ensure |left_size - right_size| ≤ 1 at every node.
+
+        Q: Given a BST of size n constructed and maintained by these self-balancing
+           versions of INSERT and DELETE, what is the maximum height (in terms of n)?
+
+        A: Θ(log n). More precisely, height ≤ ⌈log2(n + 1)⌉ due to the fact that
+           each node's left and right subtree sizes differ by at most 1.
+    */
     root: Option<Box<TreeNode>>,
 }
 
-impl Display for SelfBalancingTree {
+impl Display for BalancedTree {
     /*
-       In rust we must implement the Display trait to be able to print the tree.
+       In rust we must implement the Display trait to be able to printa defined struct.
+
+       Will print the tree node in a readable format.
 
        This allows us to print the tree in a readable format with simply calling println!("{}", tree);
     */
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-        if let Some(root) = &self.root {
-            let (left_keys, right_keys) = root.collect_all_keys();
-            writeln!(f, "Root: {}", root.key)?;
-            if !left_keys.is_empty() {
-                writeln!(f, "Left subtree keys: {:?}", left_keys)?;
+        fn fmt_node(
+            node: &Box<TreeNode>,
+            f: &mut Formatter<'_>,
+            prefix: &str,
+            is_left: bool,
+        ) -> Result<(), Error> {
+            let connector = if prefix.is_empty() {
+                ""
+            } else if is_left {
+                "├── "
             } else {
-                writeln!(f, "Left subtree keys: []")?;
+                "└── "
+            };
+            let lr_label = if is_left { "L: " } else { "R: " };
+            let l_sz = TreeNode::subtree_size(&node.left);
+            let r_sz = TreeNode::subtree_size(&node.right);
+            writeln!(
+                f,
+                "{}{}{}{} [L:{} R:{}]",
+                prefix, connector, lr_label, node.key, l_sz, r_sz
+            )?;
+
+            let next_prefix_left = if prefix.is_empty() {
+                "    "
+            } else {
+                if is_left { "│   " } else { "    " }
+            };
+            let new_prefix_left = format!("{}{}", prefix, next_prefix_left);
+
+            if let Some(ref right) = node.right {
+                fmt_node(right, f, &new_prefix_left, false)?;
             }
-            if !right_keys.is_empty() {
-                write!(f, "Right subtree keys: {:?}", right_keys)?;
-            } else {
-                write!(f, "Right subtree keys: []")?;
+            if let Some(ref left) = node.left {
+                fmt_node(left, f, &new_prefix_left, true)?;
+            }
+            Ok(())
+        }
+
+        if let Some(root) = &self.root {
+            writeln!(
+                f,
+                "Root: {} (bst_property_holds: {})",
+                root.key,
+                root.bst_property_holds()
+            )?;
+            let l_sz = TreeNode::subtree_size(&root.left);
+            let r_sz = TreeNode::subtree_size(&root.right);
+            writeln!(f, "{} [L:{} R:{}]", root.key, l_sz, r_sz)?;
+            if let Some(ref right) = root.right {
+                fmt_node(right, f, "", false)?;
+            }
+            if let Some(ref left) = root.left {
+                fmt_node(left, f, "", true)?;
             }
         } else {
-            write!(
-                f,
-                "Root: None\nLeft subtree keys: []\nRight subtree keys: []"
-            )?;
+            writeln!(f, "Root: None")?;
         }
         Ok(())
     }
 }
 
-impl SelfBalancingTree {
-    /*
-       Q: Given a BST of size n constructed and maintained by these self-balancing version of INSERT and DELETE,
-       what is the maximum height of the tree (in terms of n)?
-
-       A:
-
-    */
+impl BalancedTree {
     fn new() -> Self {
         /*
-           Will create a new empty tree.
+            Create a new, empty `BalancedTree`.
         */
         Self { root: None }
     }
 
-    fn insert(&mut self, x: TreeNode) {
+    fn recompute_counts(&mut self) {
         /*
-
-           Will insert the given node into the tree.
-
-           This is the main function for inserting a node into the tree.
-
-           It will compare the key of the node to the root node and insert it into the appropriate subtree.
-
-           If the tree is unbalanced, it will be balanced by swapping the root node with the predecessor or successor.
-
-           This is done to maintain the BST property.
-
-           Q: What are the running times, in asymptotic notation, for INSERT?
-
-           A:
-
-           Q: Are the best and worst cases different asymptotically compared to DELETE.
-
-           A:
+            Recompute `left_count` and `right_count` for all nodes in the tree.
         */
+        fn dfs(node: &mut Option<Box<TreeNode>>) -> i32 {
+            if let Some(n) = node.as_mut() {
+                let l = dfs(&mut n.left);
+                let r = dfs(&mut n.right);
+                n.left_count = l;
+                n.right_count = r;
+                1 + l + r
+            } else {
+                0
+            }
+        }
+        dfs(&mut self.root);
+    }
 
-        println!("Insert: {}", x.key);
+    fn subtree_size_opt(n: &Option<Box<TreeNode>>) -> i32 {
+        /*
+            Convenience wrapper around `TreeNode::subtree_size`.
+        */
+        TreeNode::subtree_size(n)
+    }
 
-        // First compare x to the root
-        if let Some(root) = self.root.as_mut() {
-            if x.key < root.key {
-                // In the case that x belongs in the left sub-tree
+    fn peek_max_key(n: &Option<Box<TreeNode>>) -> Option<i32> {
+        /*
+            Get the maximum key in a subtree (in-order predecessor of the subtree root).
+        */
+        let mut cur = n.as_ref();
+        let mut last = None;
+        while let Some(node) = cur {
+            last = Some(node.key);
+            cur = node.right.as_ref();
+        }
+        last
+    }
 
-                // If left sub-tree is larger than right sub-tree
-                if root.left_count > root.right_count {
-                    // compare x.key to the predecessor of the root node. (max(left sub-tree))
+    fn peek_min_key(n: &Option<Box<TreeNode>>) -> Option<i32> {
+        /*
+            Get the minimum key in a subtree (in-order successor of the subtree root).
+        */
+        let mut cur = n.as_ref();
+        let mut last = None;
+        while let Some(node) = cur {
+            last = Some(node.key);
+            cur = node.left.as_ref();
+        }
+        last
+    }
 
-                    if let Some(predecessor_idx) = root.get_predecessor_index() {
-                        let predecessor = root.left_subtree.remove(predecessor_idx);
-                        root.left_count -= 1; // Decrement before root replacement
-                        let predecessor_key = predecessor.key;
-                        if x.key > predecessor_key {
-                            // If x.key is larger
-                            // Replace the root by x and insert the former root into the right sub-tree
-                            let old_root: Box<TreeNode> = mem::replace(root, Box::new(x));
-                            root.right_subtree.push(old_root);
-                            root.right_count += 1;
-                        } else {
-                            // If x.key is smaller
-                            // Replace the root by its predecessor and insert x normally into the left sub-tree.
-                            let old_root: Box<TreeNode> = mem::replace(root, predecessor);
-                            root.left_subtree.push(Box::new(x));
-                            root.right_subtree.push(old_root);
-                            root.left_count += 1; // x added
-                            root.right_count += 1; // old root added
-                        }
-                    }
+    fn rebalance_node(node: &mut Box<TreeNode>) -> bool {
+        /*
+            Locally rebalance a single node until |left_size - right_size| ≤ 1.
+
+            Achieves balance by replacing the node's key with a predecessor/successor
+            and re-inserting the former key into the lighter subtree. Returns whether
+            any changes were made.
+        */
+        let mut changed = false;
+
+        // Rebalance the nodes
+        loop {
+            let l = TreeNode::subtree_size(&node.left);
+            let r = TreeNode::subtree_size(&node.right);
+            if (l - r).abs() <= 1 {
+                break;
+            }
+            changed = true;
+            if l > r {
+                if let Some(pred) = Self::peek_max_key(&node.left) {
+                    let old_key = node.key;
+                    node.key = pred;
+                    Self::delete_in(&mut node.left, pred);
+                    Self::bst_insert(&mut node.right, old_key);
                 } else {
-                    // Insert normally into left sub-tree
-                    root.left_subtree.push(Box::new(x));
-                    root.left_count += 1;
+                    break;
                 }
             } else {
-                // In the case that x belongs in the right sub-tree
-
-                // If the right sub-tree is larger than the left sub-tree
-                if root.right_count > root.left_count {
-                    // compare x.key to the successor of the root node. (min(right sub-tree))
-
-                    if let Some(successor_idx) = root.get_successor_index() {
-                        let successor = root.right_subtree.remove(successor_idx);
-                        root.right_count -= 1; // Decrement before root replacement
-                        let successor_key = successor.key;
-                        if x.key < successor_key {
-                            // If x.key is smaller
-                            // Replace the root by x and insert the former root into the left sub-tree.
-                            let old_root: Box<TreeNode> = mem::replace(root, Box::new(x));
-                            root.left_subtree.push(old_root);
-                            root.left_count += 1;
-                        } else {
-                            // If x.key is larger
-                            // Replace the root by its successor and insert x normally into the right sub-tree.
-                            // Move successor to the left sub-tree
-                            let old_root: Box<TreeNode> = mem::replace(root, successor);
-                            root.right_subtree.push(Box::new(x));
-                            root.left_subtree.push(old_root);
-                            root.right_count += 1;
-                            root.left_count += 1;
-                        }
-                    }
+                if let Some(succ) = Self::peek_min_key(&node.right) {
+                    let old_key = node.key;
+                    node.key = succ;
+                    Self::delete_in(&mut node.right, succ);
+                    Self::bst_insert(&mut node.left, old_key);
                 } else {
-                    // Insert normally into right sub-tree
-                    root.right_subtree.push(Box::new(x));
-                    root.right_count += 1;
+                    break;
                 }
             }
-        } else {
-            // No root exists, create new root
-            self.root = Some(Box::new(x));
         }
+        changed
+    }
+
+    fn rebalance_all(node: &mut Option<Box<TreeNode>>) -> bool {
+        /*
+            Post-order traversal that rebalances all nodes. Returns true if any
+            node was changed during the pass.
+        */
+        if let Some(n) = node.as_mut() {
+            let mut changed = false;
+
+            // Recurse into children first
+            if Self::rebalance_all(&mut n.left) {
+                changed = true;
+            }
+
+            if Self::rebalance_all(&mut n.right) {
+                changed = true;
+            }
+
+            // Then fix current node
+            if Self::rebalance_node(n) {
+                changed = true;
+            }
+
+            return changed;
+        }
+        false
+    }
+
+    fn bst_insert(node: &mut Option<Box<TreeNode>>, key: i32) {
+        /*
+            Standard BST insert into a given subtree, without balancing.
+        */
+        if node.is_none() {
+            *node = Some(Box::new(TreeNode::new(key)));
+            return;
+        }
+        let n = node.as_mut().unwrap();
+        if key < n.key {
+            Self::bst_insert(&mut n.left, key);
+        } else if key > n.key {
+            Self::bst_insert(&mut n.right, key);
+        }
+    }
+
+    fn delete_in(node: &mut Option<Box<TreeNode>>, key: i32) -> bool {
+        /*
+            Standard BST delete within a given subtree. Returns true if a node was
+            removed. Used internally by `insert`, `delete`, and rebalancing steps.
+        */
+        if node.is_none() {
+            return false;
+        }
+        let should_delete_here;
+        {
+            let n = node.as_ref().unwrap();
+            if key < n.key {
+                return Self::delete_in(&mut node.as_mut().unwrap().left, key);
+            } else if key > n.key {
+                return Self::delete_in(&mut node.as_mut().unwrap().right, key);
+            } else {
+                should_delete_here = true;
+            }
+        }
+        if should_delete_here {
+            // Handle deletion at this node
+            let mut cur = node.take().unwrap();
+            let left_opt = cur.left.take();
+            let right_opt = cur.right.take();
+            if left_opt.is_none() && right_opt.is_none() {
+                *node = None;
+            } else if left_opt.is_some() && right_opt.is_none() {
+                *node = left_opt;
+            } else if left_opt.is_none() && right_opt.is_some() {
+                *node = right_opt;
+            } else {
+                // both children exist
+                let left = left_opt.unwrap();
+                let right = right_opt.unwrap();
+
+                // Replace with successor (min of right)
+                let mut right_opt2 = Some(right);
+                let succ_key = {
+                    let mut p = right_opt2.as_ref();
+                    let mut last = None;
+                    while let Some(nn) = p {
+                        last = Some(nn.key);
+                        p = nn.left.as_ref();
+                    }
+                    last.unwrap()
+                };
+                // remove successor key from right subtree
+                Self::delete_in(&mut right_opt2, succ_key);
+                let mut new_node = Box::new(TreeNode::new(succ_key));
+                new_node.left = Some(left);
+                new_node.right = right_opt2;
+                *node = Some(new_node);
+            }
+            return true;
+        }
+        false
+    }
+
+    fn insert(&mut self, x: TreeNode) {
+        /*
+            Insert a key with root-aware balancing. If one side of the root is larger,
+            apply the predecessor/successor rules to keep the two sides within 1, then
+            run a fixpoint rebalancing pass across the entire tree.
+
+            Q: What are the running times, in asymptotic notation, for INSERT?
+
+            A: Best Θ(log n) when the tree is already balanced and only a root-local
+               adjustment (or none) is needed. Typical Θ(log n) to descend plus
+               O(1) rebalances.
+
+               Worst-case Θ(n log n) for a full-tree rebalance pass
+               (O(log n) work at many nodes).
+
+            Q: Are the best and worst cases different asymptotically compared to DELETE.
+
+            A: Same as DELETE.
+        */
+        println!("Insert: {}", x.key);
+        // Empty tree
+        if self.root.is_none() {
+            self.root = Some(Box::new(TreeNode::new(x.key)));
+            self.recompute_counts();
+            return;
+        }
+
+        // Ensure counts are up to date
+        self.recompute_counts();
+
+        if let Some(root) = self.root.as_mut() {
+            if x.key == root.key {
+                return;
+            }
+
+            let l = Self::subtree_size_opt(&root.left);
+            let r = Self::subtree_size_opt(&root.right);
+
+            if x.key < root.key {
+                if l > r {
+                    if let Some(pred) = Self::peek_max_key(&root.left) {
+                        if x.key > pred {
+                            // replace parent by x and insert former parent into the right sub-tree
+                            let old_key = root.key;
+                            root.key = x.key;
+                            Self::bst_insert(&mut root.right, old_key);
+                        } else {
+                            // replace the parent by its predecessor and insert x normally into the left sub-tree
+                            let old_key = root.key;
+                            let pred_val = pred;
+                            root.key = pred_val;
+                            Self::delete_in(&mut root.left, pred_val);
+                            Self::bst_insert(&mut root.left, x.key);
+
+                            // preserve the former parent key in the right sub-tree
+                            Self::bst_insert(&mut root.right, old_key);
+                        }
+                    } else {
+                        // No predecessor, insert normally
+                        Self::bst_insert(&mut root.left, x.key);
+                    }
+                } else {
+                    Self::bst_insert(&mut root.left, x.key);
+                }
+            } else {
+                if r > l {
+                    if let Some(succ) = Self::peek_min_key(&root.right) {
+                        if x.key < succ {
+                            // replace parent by x and insert former parent into the left sub-tree
+                            let old_key = root.key;
+                            root.key = x.key;
+                            Self::bst_insert(&mut root.left, old_key);
+                        } else {
+                            // replace the parent by its successor and insert x normally into the right sub-tree
+                            let old_key = root.key;
+                            let succ_val = succ;
+                            root.key = succ_val;
+                            Self::delete_in(&mut root.right, succ_val);
+                            Self::bst_insert(&mut root.right, x.key);
+
+                            // preserve the former parent key in the left sub-tree
+                            Self::bst_insert(&mut root.left, old_key);
+                        }
+                    } else {
+                        // No successor, insert normally
+                        Self::bst_insert(&mut root.right, x.key);
+                    }
+                } else {
+                    Self::bst_insert(&mut root.right, x.key);
+                }
+            }
+        }
+
+        self.recompute_counts();
+        // Balance the tree
+        loop {
+            let changed = Self::rebalance_all(&mut self.root);
+            if !changed {
+                break;
+            }
+        }
+        self.recompute_counts();
     }
 
     fn delete(&mut self, x: i32) {
         /*
+            Delete a key and then rebalance the tree.
 
-           Will delete the given node from the tree.
+            Q: What are the running times, in asymptotic notation, for DELETE?
 
-           This is the main function for deleting a node from the tree.
+            A: Best Θ(log n) when the tree remains balanced and only local work is
+               needed; typical Θ(log n) to descend plus small, local rebalancing;
+               worst-case Θ(n log n) for a full-tree rebalance pass.
 
-           It will compare the key of the node to the root node and delete it from the appropriate subtree.
+            Q: Are the best and worst cases different asymptotically compared to Insert?
 
-           If the tree is unbalanced, it will be balanced by swapping the root node with the predecessor or successor.
-
-           This is done to maintain the BST property.
-
-           Q: What are the running times, in asymptotic notation, for DELETE?
-
-           A:
-
-           Q: Are the best and worst cases different asymptotically compared to Insert?
-
-           A:
+            A: Same as INSERT.
         */
-
-        println!("Delete: {}", x);
-
-        // Delete x in the normal way for BST
-
-        // Check if we're deleting the root with no children first
-        if let Some(root_ref) = self.root.as_ref() {
-            if root_ref.key == x
-                && root_ref.left_subtree.is_empty()
-                && root_ref.right_subtree.is_empty()
-            {
-                // Root deletion with no children - set to None
-                self.root = None;
-                return;
-            }
-        }
-
-        if let Some(root) = self.root.as_mut() {
-            if x == root.key {
-                // x == root.key - deleting the root itself (with children)
-
-                // Replace the root node by its predecessor
-                if let Some(predecessor_idx) = root.get_predecessor_index() {
-                    let predecessor = root.left_subtree.remove(predecessor_idx);
-                    let _ = mem::replace(root, predecessor);
-                    root.left_count -= 1;
-                } else if let Some(successor_idx) = root.get_successor_index() {
-                    // No predecessor found, so we need to replace the root with the successor
-                    let successor = root.right_subtree.remove(successor_idx);
-                    let _ = mem::replace(root, successor);
-                    root.left_count += 1;
-                    root.right_count -= 1;
-                }
-            } else {
-                // x != root.key - search both subtrees since BST property may not hold due to balancing
-                // Try left subtree first
-                if TreeNode::remove_from_subtree(&mut root.left_subtree, x) {
-                    root.left_count -= 1;
-                } else if TreeNode::remove_from_subtree(&mut root.right_subtree, x) {
-                    // Not in left, try right subtree
-                    root.right_count -= 1;
-                } else {
-                    panic!("x {} not found in tree", x);
+        if Self::delete_in(&mut self.root, x) {
+            self.recompute_counts();
+            // Rebalance the tree
+            loop {
+                let changed = Self::rebalance_all(&mut self.root);
+                if !changed {
+                    break;
                 }
             }
-
-            // Then fixup the left and right sizes for all nodes
-
-            // Compare the new left and right-sizes of the root node after deletion.
-            if root.left_count > root.right_count + 1 && !root.left_subtree.is_empty() {
-                // If the left-size is larger than the right-size by more than 1
-                // Replace the root node by its predecessor and re-insert the former root node into the right sub-tree.
-                if let Some(predecessor_idx) = root.get_predecessor_index() {
-                    let predecessor = root.left_subtree.remove(predecessor_idx);
-                    let old_root: Box<TreeNode> = mem::replace(root, predecessor);
-                    root.right_subtree.push(old_root);
-                    root.right_count += 1;
-                    root.left_count -= 1;
-                }
-            } else if root.right_count > root.left_count + 1 && !root.right_subtree.is_empty() {
-                // If the right-size is larger than the left-size by more than 1
-                // Replace the root node by its successor and re-insert the former root node into the left sub-tree.
-                if let Some(successor_idx) = root.get_successor_index() {
-                    let successor = root.right_subtree.remove(successor_idx);
-                    let old_root: Box<TreeNode> = mem::replace(root, successor);
-                    root.left_subtree.push(old_root);
-                    root.left_count += 1;
-                    root.right_count -= 1;
-                }
-            }
+            self.recompute_counts();
         }
     }
 }
@@ -381,50 +511,45 @@ fn main() {
         resulting in a tree of size 15.
     */
 
-    // Create a vector of operations, each a closure taking &mut SelfBalancingTree
-    let operations: Vec<Box<dyn Fn(&mut SelfBalancingTree)>> = vec![
-        Box::new(|tree| tree.insert(TreeNode::new(1))), // Count = 1
-        Box::new(|tree| tree.insert(TreeNode::new(2))), // Count = 2
-        Box::new(|tree| tree.insert(TreeNode::new(3))), // Count = 3
-        Box::new(|tree| tree.delete(1)),                // Count = 2
-        Box::new(|tree| tree.delete(2)),                // Count = 1
-        Box::new(|tree| tree.delete(3)),                // Count = 0
-        Box::new(|tree| tree.insert(TreeNode::new(4))), // Count = 1
-        Box::new(|tree| tree.insert(TreeNode::new(5))), // Count = 2
-        Box::new(|tree| tree.insert(TreeNode::new(6))), // Count = 3
-        Box::new(|tree| tree.insert(TreeNode::new(7))), // Count = 4
-        Box::new(|tree| tree.insert(TreeNode::new(8))), // Count = 5
-        Box::new(|tree| tree.insert(TreeNode::new(9))), // Count = 6
-        Box::new(|tree| tree.insert(TreeNode::new(10))), // Count = 7
-        Box::new(|tree| tree.insert(TreeNode::new(11))), // Count = 8
-        Box::new(|tree| tree.insert(TreeNode::new(12))), // Count = 9
-        Box::new(|tree| tree.insert(TreeNode::new(13))), // Count = 10
-        Box::new(|tree| tree.insert(TreeNode::new(14))), // Count = 11
-        Box::new(|tree| tree.insert(TreeNode::new(15))), // Count = 12
-        Box::new(|tree| tree.insert(TreeNode::new(16))), // Count = 13
-        Box::new(|tree| tree.insert(TreeNode::new(17))), // Count = 14
-        Box::new(|tree| tree.insert(TreeNode::new(18))), // Count = 15
-        Box::new(|tree| tree.insert(TreeNode::new(19))), // Count = 16
-        Box::new(|tree| tree.insert(TreeNode::new(20))), // Count = 17
-        Box::new(|tree| tree.insert(TreeNode::new(21))), // Count = 18
-        Box::new(|tree| tree.insert(TreeNode::new(22))), // Count = 19
-        Box::new(|tree| tree.insert(TreeNode::new(23))), // Count = 20
-        Box::new(|tree| tree.insert(TreeNode::new(24))), // Count = 21
-        Box::new(|tree| tree.delete(24)),               // Count = 20
-        Box::new(|tree| tree.delete(23)),               // Count = 19
-        Box::new(|tree| tree.delete(22)),               // Count = 18
-        Box::new(|tree| tree.delete(21)),               // Count = 17
-        Box::new(|tree| tree.delete(20)),               // Count = 16
-        Box::new(|tree| tree.delete(19)),               // Count = 15
+    // Insert and delete 24 elements to build a tree of size 15
+    let mut tree = BalancedTree::new();
+    let ops_rb: Vec<Box<dyn Fn(&mut BalancedTree)>> = vec![
+        Box::new(|t| t.insert(TreeNode::new(1))),
+        Box::new(|t| t.insert(TreeNode::new(2))),
+        Box::new(|t| t.insert(TreeNode::new(3))),
+        Box::new(|t| t.delete(1)),
+        Box::new(|t| t.delete(2)),
+        Box::new(|t| t.delete(3)),
+        Box::new(|t| t.insert(TreeNode::new(4))),
+        Box::new(|t| t.insert(TreeNode::new(5))),
+        Box::new(|t| t.insert(TreeNode::new(6))),
+        Box::new(|t| t.insert(TreeNode::new(7))),
+        Box::new(|t| t.insert(TreeNode::new(8))),
+        Box::new(|t| t.insert(TreeNode::new(9))),
+        Box::new(|t| t.insert(TreeNode::new(10))),
+        Box::new(|t| t.insert(TreeNode::new(11))),
+        Box::new(|t| t.insert(TreeNode::new(12))),
+        Box::new(|t| t.insert(TreeNode::new(13))),
+        Box::new(|t| t.insert(TreeNode::new(14))),
+        Box::new(|t| t.insert(TreeNode::new(15))),
+        Box::new(|t| t.insert(TreeNode::new(16))),
+        Box::new(|t| t.insert(TreeNode::new(17))),
+        Box::new(|t| t.insert(TreeNode::new(18))),
+        Box::new(|t| t.insert(TreeNode::new(19))),
+        Box::new(|t| t.insert(TreeNode::new(20))),
+        Box::new(|t| t.insert(TreeNode::new(21))),
+        Box::new(|t| t.insert(TreeNode::new(22))),
+        Box::new(|t| t.insert(TreeNode::new(23))),
+        Box::new(|t| t.insert(TreeNode::new(24))),
+        Box::new(|t| t.delete(24)),
+        Box::new(|t| t.delete(23)),
+        Box::new(|t| t.delete(22)),
+        Box::new(|t| t.delete(21)),
+        Box::new(|t| t.delete(20)),
+        Box::new(|t| t.delete(19)),
     ];
-
-    // Create our balancing tree
-    let mut balancing_tree = SelfBalancingTree::new();
-
-    // Preform The Operations on the Tree
-    for op in &operations {
-        op(&mut balancing_tree);
-
-        println!("Tree: {} \n", balancing_tree);
+    for op in &ops_rb {
+        op(&mut tree);
+        println!("[Balanced Tree] Tree: {} \n", tree);
     }
 }
