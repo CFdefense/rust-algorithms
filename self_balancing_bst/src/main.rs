@@ -123,9 +123,11 @@ impl Display for BalancedTree {
             } else {
                 "└── "
             };
+
             let lr_label = if is_left { "L: " } else { "R: " };
             let l_sz = TreeNode::subtree_size(&node.left);
             let r_sz = TreeNode::subtree_size(&node.right);
+
             writeln!(
                 f,
                 "{}{}{}{} [L:{} R:{}]",
@@ -137,11 +139,13 @@ impl Display for BalancedTree {
             } else {
                 if is_left { "│   " } else { "    " }
             };
+
             let new_prefix_left = format!("{}{}", prefix, next_prefix_left);
 
             if let Some(ref right) = node.right {
                 fmt_node(right, f, &new_prefix_left, false)?;
             }
+
             if let Some(ref left) = node.left {
                 fmt_node(left, f, &new_prefix_left, true)?;
             }
