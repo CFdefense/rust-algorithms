@@ -59,7 +59,7 @@ impl<T> Stack<T> {
     /// Add a new node to the head.
     /// Set the previous node as the next.
     ///
-    /// Returns None
+    /// Returns None.
     ///
     pub fn push(&mut self, value: T) {
         // Take the previous head
@@ -96,7 +96,7 @@ impl<T> Stack<T> {
     ///
     /// Peek at the top (head) element of the Stack.
     ///
-    /// Returns an optional element
+    /// Returns an optional element from the top of the Stack.
     ///
     pub fn peek(&self) -> Option<&T> {
         self.head.as_deref().map(|node| &node.value)
