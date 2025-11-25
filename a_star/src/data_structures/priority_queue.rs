@@ -163,7 +163,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_operations() {
+    fn test_priority_queue() {
         let mut priority_queue = PriorityQueue::<u32>::new();
 
         priority_queue.push(1);
