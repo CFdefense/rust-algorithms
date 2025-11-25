@@ -1,3 +1,7 @@
+mod data_structures;
+
+use data_structures::*;
+
 fn main() {
     /*
         A* Search
