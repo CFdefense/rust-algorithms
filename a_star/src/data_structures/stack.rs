@@ -119,28 +119,38 @@ mod tests {
 
     #[test]
     fn test_stack() {
+        // Create a new stack
         let mut stack = Stack::<u32>::new();
 
+        // Initially, stack should be empty and have length 0
         assert_eq!(stack.len(), 0);
         assert_eq!(stack.is_empty(), true);
 
+        // Push values onto the stack
         stack.push(1);
         stack.push(2);
         stack.push(3);
 
-        assert_eq!(stack.pop(), Some(3));
+        // Pop values and check LIFO behavior
+        assert_eq!(stack.pop(), Some(3)); // Last in, first out
         assert_eq!(stack.pop(), Some(2));
         assert_eq!(stack.pop(), Some(1));
+
+        // Stack is now empty, popping should return None
         assert_eq!(stack.pop(), None);
 
+        // Confirm stack length and empty state
         assert_eq!(stack.len(), 0);
         assert_eq!(stack.is_empty(), true);
 
+        // Push another value to test reusability
         stack.push(1);
 
+        // Length should reflect new element, stack is no longer empty
         assert_eq!(stack.len(), 1);
         assert_eq!(stack.is_empty(), false);
 
+        // Pop the last element
         assert_eq!(stack.pop(), Some(1));
     }
 }

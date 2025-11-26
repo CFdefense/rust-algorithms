@@ -225,8 +225,10 @@ mod tests {
 
     #[test]
     fn test_priority_queue() {
+        // Create a new Priority Queue
         let mut priority_queue = PriorityQueue::<u32>::new();
 
+        // Push multiple values into the priority queue
         priority_queue.push(1);
         priority_queue.push(2);
         priority_queue.push(3);
@@ -236,23 +238,36 @@ mod tests {
         priority_queue.push(6);
         priority_queue.push(5);
 
-        assert_eq!(priority_queue.pop(), Some(1));
+        // Pop elements one by one and check that they come out in ascending order
+        assert_eq!(priority_queue.pop(), Some(1)); // smallest element
         assert_eq!(priority_queue.pop(), Some(2));
         assert_eq!(priority_queue.pop(), Some(3));
         assert_eq!(priority_queue.pop(), Some(4));
+
+        // Check length after some pops
         assert_eq!(priority_queue.len(), 4);
+
+        // Continue popping
         assert_eq!(priority_queue.pop(), Some(5));
         assert_eq!(priority_queue.pop(), Some(6));
+
+        // Length should now be 2
         assert_eq!(priority_queue.len(), 2);
+
+        // Pop remaining elements
         assert_eq!(priority_queue.pop(), Some(9));
         assert_eq!(priority_queue.pop(), Some(10));
-        assert_eq!(priority_queue.is_empty(), true)
+
+        // The queue should now be empty
+        assert_eq!(priority_queue.is_empty(), true);
     }
 
     #[test]
     fn test_min_heap() {
+        // Create a new Min-Heap
         let mut min_heap = MinHeap::<u32>::new();
 
+        // Push multiple values into the min-heap
         min_heap.push(1);
         min_heap.push(2);
         min_heap.push(3);
@@ -262,16 +277,27 @@ mod tests {
         min_heap.push(6);
         min_heap.push(5);
 
+        // Pop elements one by one and check that they come out in ascending order
         assert_eq!(min_heap.pop(), Some(1));
         assert_eq!(min_heap.pop(), Some(2));
         assert_eq!(min_heap.pop(), Some(3));
         assert_eq!(min_heap.pop(), Some(4));
+
+        // Check length after some pops
         assert_eq!(min_heap.len(), 4);
+
+        // Continue popping
         assert_eq!(min_heap.pop(), Some(5));
         assert_eq!(min_heap.pop(), Some(6));
+
+        // Length should now be 2
         assert_eq!(min_heap.len(), 2);
+
+        // Pop remaining elements
         assert_eq!(min_heap.pop(), Some(9));
         assert_eq!(min_heap.pop(), Some(10));
-        assert_eq!(min_heap.is_empty(), true)
+
+        // The heap should now be empty
+        assert_eq!(min_heap.is_empty(), true);
     }
 }
