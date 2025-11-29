@@ -1,5 +1,5 @@
 {
   "rust-analyzer.linkedProjects": [
-    "self_balancing_bst/Cargo.toml"
+    "a_star/Cargo.toml"
   ]
 }

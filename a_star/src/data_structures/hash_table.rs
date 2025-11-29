@@ -7,18 +7,15 @@
         Each class must have a static function that performs a unit test of the class by instantiating and and calling the methods of the class.
 */
 
-use core::hash;
 use rand::Rng;
-use std::collections::btree_map::Keys;
 use std::collections::hash_map::DefaultHasher;
-use std::error::Error;
 use std::hash::{Hash, Hasher};
 
 #[derive(Clone)]
 enum Slot<K, V> {
-    Empty,     // never used
-    Tombstone, // deleted
-    Occupied(K, V),
+    Empty,          // Never used
+    Tombstone,      // Deleted
+    Occupied(K, V), // In-use
 }
 
 #[derive(Debug, PartialEq)]
@@ -29,15 +26,20 @@ pub enum HashTableError {
 
 pub struct HashTable<K, V> {
     table: Vec<Slot<K, V>>,
-    a: u64,   // Randomly Generated Number
-    b: u64,   // Randomly Generated Number
-    p: u64,   // Number Larger Than Largest Key (Use prime 64 bit)
-    m: usize, // Max Table Size (Will use 101)
-    len: usize,
+    a: u64,     // Randomly Generated Number
+    b: u64,     // Randomly Generated Number
+    p: u64,     // Number Larger Than Largest Key (Use prime 64 bit)
+    m: usize,   // Max Table Size (Will use 101)
+    len: usize, // Items in the table
 }
 
 impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
     /// new()
+    ///
+    /// Creates a new instance of the HashTable.
+    ///
+    /// Returns an instance of the hashTable.
+    ///
     pub fn new() -> Self {
         // Randomly Generate a and b
         let p = 2305843009213693951; // 2^61 - 1 (64 bit prime)
@@ -63,9 +65,9 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
     ///
     /// Returns Result of success or error.
     ///
-    pub fn insert(&mut self, key: &K, value: &V) -> Result<(), HashTableError> {
+    pub fn insert(&mut self, key: K, value: V) -> Result<(), HashTableError> {
         // Hash the key
-        let mut hash_key = self.universal_hash(key);
+        let mut hash_key = self.universal_hash(&key);
         let start = hash_key;
 
         // Begin Linear probing
@@ -78,7 +80,7 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
                     return Ok(());
                 }
                 Slot::Occupied(existing_key, _) => {
-                    if existing_key == key {
+                    if existing_key == &key {
                         // Key already exists, update value
                         self.table[hash_key] = Slot::Occupied(key.clone(), value.clone());
                         return Ok(());
@@ -143,6 +145,39 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
         }
     }
 
+    /// get_mut()
+    ///
+    /// Mutable version of get()
+    /// Will hash the key and look for the Slot.
+    /// If Slot Occupied and key matches we found it and return Value.
+    /// If Slot found is Empty, the key does not exist.
+    ///
+    /// Returns mutable value
+    ///
+    pub fn get_mut(&mut self, key: &K) -> Result<&mut V, HashTableError> {
+        let mut hash_key = self.universal_hash(key);
+        let start = hash_key;
+
+        loop {
+            match self.table[hash_key] {
+                Slot::Empty => return Err(HashTableError::KeyNotFound),
+                Slot::Occupied(ref existing_key, _) if existing_key == key => {
+                    // We do a second match to get a mutable reference
+                    match &mut self.table[hash_key] {
+                        Slot::Occupied(_, value) => return Ok(value),
+                        _ => unreachable!(),
+                    }
+                }
+                _ => {
+                    hash_key = (hash_key + 1) % self.m;
+                    if hash_key == start {
+                        return Err(HashTableError::KeyNotFound);
+                    }
+                }
+            }
+        }
+    }
+
     /// remove()
     ///
     /// Will hash the key and look for the Slot.
@@ -159,7 +194,7 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
         // Begin Linear probing
         loop {
             match &self.table[hash_key] {
-                Slot::Occupied(existing_key, value) => {
+                Slot::Occupied(existing_key, _) => {
                     if existing_key == key {
                         // Key found, remove the value
                         self.table[hash_key] = Slot::Tombstone;
@@ -202,13 +237,13 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
     ///
     pub fn contains(&self, key: &K) -> bool {
         // Hash the key
-        let mut hash_key = self.universal_hash(key);
+        let mut hash_key = self.universal_hash(&key);
         let start = hash_key;
 
         // Begin Linear probing
         loop {
             match &self.table[hash_key] {
-                Slot::Occupied(existing_key, value) => {
+                Slot::Occupied(existing_key, _) => {
                     if existing_key == key {
                         // Key found
                         return true;
@@ -296,12 +331,12 @@ mod tests {
         assert_eq!(table.len(), 0);
 
         // Insert a key-value pair
-        assert!(table.insert(&1, &"one").is_ok());
+        assert!(table.insert(1, "one").is_ok());
         assert_eq!(table.len(), 1);
         assert!(!table.is_empty());
 
         // Insert another key-value
-        assert!(table.insert(&2, &"two").is_ok());
+        assert!(table.insert(2, "two").is_ok());
 
         // Test get()
         assert_eq!(table.get(&1).unwrap(), &"one");
@@ -313,7 +348,7 @@ mod tests {
         assert!(!table.contains(&3));
 
         // Test updating existing key
-        assert!(table.insert(&1, &"uno").is_ok());
+        assert!(table.insert(1, "uno").is_ok());
         assert_eq!(table.get(&1).unwrap(), &"uno");
 
         // Test remove
@@ -323,5 +358,9 @@ mod tests {
 
         // Test get for a non-existent key
         assert_eq!(table.get(&99).unwrap_err(), HashTableError::KeyNotFound);
+
+        // Test for duplicate key
+        assert!(table.insert(1, "uno").is_ok());
+        assert!(table.insert(1, "dos").is_ok());
     }
 }
