@@ -32,9 +32,9 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
     ///
     /// Returns an instance of a WeightedDirectedGraph.
     ///
-    fn new() -> Self {
+    pub fn new() -> Self {
         WeightedDirectedGraph {
-            adj_list: HashTable::new(),
+            adj_list: HashTable::<T, Vec<(T, f64)>>::new(),
         }
     }
 
@@ -45,7 +45,7 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
     ///
     /// Returns the Result of the operation.
     ///
-    fn add_vertex(&mut self, id: T) -> Result<(), GraphError> {
+    pub fn add_vertex(&mut self, id: T) -> Result<(), GraphError> {
         if !self.adj_list.contains(&id) {
             self.adj_list
                 .insert(id, Vec::new())
@@ -63,7 +63,7 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
     ///
     /// Returns the Result of the Operation.
     ///
-    fn add_edge(&mut self, to: T, from: T, cost: f64) -> Result<(), GraphError> {
+    pub fn add_edge(&mut self, to: T, from: T, cost: f64) -> Result<(), GraphError> {
         // Confirm we have the vertices
         if !self.adj_list.contains(&from) {
             return Err(GraphError::FromNotFound);
