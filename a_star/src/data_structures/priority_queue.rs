@@ -12,6 +12,11 @@
         Each class must have a static function that performs a unit test of the class by instantiating and and calling the methods of the class.
 */
 
+
+/// PriorityQueue<T>
+/// 
+/// PriorityQueue data structure implemented via MinHeap
+/// 
 pub struct PriorityQueue<T> {
     heap: MinHeap<T>,
 }
@@ -81,6 +86,11 @@ impl<T: Default + PartialOrd> PriorityQueue<T> {
     }
 }
 
+
+/// MinHeap<T>
+/// 
+/// MinHeap data structure implemented via Vector.
+/// 
 struct MinHeap<T> {
     data: Vec<T>,
 }
@@ -235,6 +245,7 @@ impl<T: Default + PartialOrd> MinHeap<T> {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -278,7 +289,7 @@ mod tests {
         assert_eq!(priority_queue.is_empty(), true);
     }
 
-    
+
     #[test]
     fn test_min_heap() {
         // Create a new Min-Heap

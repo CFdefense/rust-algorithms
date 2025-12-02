@@ -6,6 +6,12 @@
         Each class must have a static function that performs a unit test of the class by instantiating and and calling the methods of the class.
 */
 
+/// Node<T>
+/// 
+/// A Structure representing a Linked-List Node.
+/// Use Box because we do not know the size of the 'next during compile time.
+/// Rust does not allow us to use a raw pointer.
+/// 
 #[derive(PartialEq)]
 struct Node<T> {
     pub value: T,
@@ -26,6 +32,12 @@ impl<T> Node<T> {
 }
 
 
+/// Stack<T>
+/// 
+/// Our stack structure implemented via Linked-List
+/// Use Box because we do not know the size of the 'next during compile time.
+/// Rust does not allow us to use a raw pointer.
+/// 
 #[allow(dead_code)]
 pub struct Stack<T> {
     head: Option<Box<Node<T>>>,
@@ -122,6 +134,7 @@ impl<T> Stack<T> {
         self.head.is_none()
     }
 }
+
 
 #[cfg(test)]
 mod tests {

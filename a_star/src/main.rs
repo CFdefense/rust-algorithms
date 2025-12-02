@@ -1,7 +1,9 @@
 mod data_structures;
 
+
 use core::panic;
 use std::{cmp::Ordering, fmt};
+
 
 use crate::data_structures::{
     graph::{GraphError, WeightedDirectedGraph},
@@ -10,6 +12,10 @@ use crate::data_structures::{
 };
 
 
+/// AStarError
+/// 
+/// An Error Type for all errors a A* Search can expect during operations.
+/// 
 #[derive(Debug)]
 enum AStarError {
     NoPathFound,
@@ -17,6 +23,11 @@ enum AStarError {
 }
 
 
+/// Location
+/// 
+/// A location to be used as a type for our graph.
+/// Contains location name, lat and long coordinates.
+/// 
 #[derive(Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Default)]
 struct Location {
     name: String,
@@ -25,6 +36,11 @@ struct Location {
 }
 
 
+/// PriorityLocation
+/// 
+/// A location with a weighted priority attached.
+/// Simple wrapping struct.
+/// 
 #[derive(Clone, PartialEq, Eq, Default)]
 struct PriorityLocation {
     location: Location,
@@ -32,6 +48,13 @@ struct PriorityLocation {
 }
 
 
+/// OrderedFloat(f64)
+/// 
+/// A float which can be ordered.
+/// Necessary to meet Trait expectations of data structures.
+/// Weights need to implement Ordering.
+/// Not normally allowed in Rust but well do it anyways.
+/// 
 #[derive(Clone, Copy, PartialEq, Default)]
 struct OrderedFloat(f64);
 
@@ -802,7 +825,7 @@ mod tests {
         assert_eq!(path[1].name, "End");
     }
 
-    
+
     #[test]
     fn test_a_star_no_path() {
         let locations = vec![

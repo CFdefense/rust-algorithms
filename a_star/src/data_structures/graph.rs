@@ -9,10 +9,15 @@
         Each class must have a static function that performs a unit test of the class by instantiating and and calling the methods of the class.
 */
 
+
 use crate::data_structures::hash_table::HashTable;
 use std::hash::Hash;
 
 
+/// GraphError
+/// 
+/// An Error Type for all errors a Graph can expect during operations.
+/// 
 #[derive(Debug)]
 pub enum GraphError {
     VertexAlreadyExists,
@@ -24,6 +29,11 @@ pub enum GraphError {
 }
 
 
+/// WeightedDirectedGraph<T>
+/// 
+/// WeightedDirectedGraph Implemented via adjancency list
+/// Uses a HashTable as its backing which maps type T to f64 weight
+/// 
 pub struct WeightedDirectedGraph<T> {
     adj_list: HashTable<T, Vec<(T, f64)>>,
 }
@@ -113,7 +123,7 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
             .unwrap_or_else(|_| Vec::new())
     }
 
-    
+
     /// get_weight()
     ///
     /// Finds and returns the weight between two nodes.
@@ -151,6 +161,7 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
         }
     }
 }
+
 
 #[cfg(test)]
 mod tests {

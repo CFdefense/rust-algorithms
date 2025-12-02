@@ -7,11 +7,17 @@
         Each class must have a static function that performs a unit test of the class by instantiating and and calling the methods of the class.
 */
 
+
 use rand::Rng;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
 
+/// Slot<K, V>
+/// 
+/// A Singular Slot in the HashTable.
+/// It can be Empty, Tombstone (deleted), or in-use with data.
+/// 
 #[derive(Clone)]
 #[allow(dead_code)]
 enum Slot<K, V> {
@@ -21,13 +27,20 @@ enum Slot<K, V> {
 }
 
 
+/// HashTableError
+/// 
+/// An Error Type for all errors a HashTable can expect during operations.
+/// 
 #[derive(Debug, PartialEq)]
 pub enum HashTableError {
     TableFull,
     KeyNotFound,
 }
 
-
+/// HashTable<K, V>
+/// 
+/// HashTable implementation using Universal Hashing.
+/// 
 pub struct HashTable<K, V> {
     table: Vec<Slot<K, V>>,
     a: u64,     // Randomly Generated Number
@@ -321,7 +334,7 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
         hasher.finish()
     }
 
-    
+
     /// universal_hash
     ///
     /// Hashes a key using our universal hashing function.
@@ -334,6 +347,7 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
         (hash_val as usize) % self.m
     }
 }
+
 
 #[cfg(test)]
 mod tests {
