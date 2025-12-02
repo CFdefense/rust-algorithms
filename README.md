@@ -12,11 +12,11 @@ All work in this repository reflects my solutions and understanding of course ma
 ---
 
 ## Assignments
-- [ ] Assignment 1: `a_star`
-- [ ] Assignment 2: `dfs_edge_classification`
+- [ ] Assignment 1: `hello_world`
+- [ ] Assignment 2: `simple_bfs`
 - [ ] Assignment 3: `self_balancing_bst`
-- [ ] Assignment 4: `simple_bfs`
-- [ ] Assignment 5: `hello_world`
+- [ ] Assignment 4: `dfs_edge_classification`
+- [ ] Assignment 5: `a_star`
 
 *(This list will be updated as assignments are completed and submitted.)*
 
