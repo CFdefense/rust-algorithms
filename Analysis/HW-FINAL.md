@@ -31,23 +31,24 @@ The analysis below assumes that the generic type `T` provides only the minimal t
 
 ### contains_vertex(vertex)
 ```rs
-pub fn contains_vertex(&self, vertex: &T) -> bool {
-    self.adj_list.contains(vertex)
+pub fn contains_vertex(&self, vertex: &T) -> bool {                                                 
+    self.adj_list.contains(vertex)                                                                  // C1: T = O(1)     Reason: Hash Lookup
 }
 ```
+Result: O(1)
 
 ##### See Hash Table .contains() @ HashTable<K, V> Below
 
 ### get_neighbors(vertex)
 ```rs
 pub fn get_neighbors(&self, vertex: T) -> Vec<(T, f64)> {
-    self.adj_list
-        .get(&vertex)
-        .map(|v| v.clone())
-        .unwrap_or_else(|_| Vec::new())
+    self.adj_list                                                                                   
+        .get(&vertex)                                                                               // C1: T = O(1)     Reason: Hash Lookup
+        .map(|v| v.clone())                                                                         // C2: T = O(k)     Reason: Neighbor count
+        .unwrap_or_else(|_| Vec::new())                                                             // C3: T = O(1)     Reason: Unwrap operation and vector init both O(1)
 }
 ```
-
+Result: O(k) where k is v.neighbors
 
 ## PriorityQueue<T>
 
@@ -55,17 +56,19 @@ pub fn get_neighbors(&self, vertex: T) -> Vec<(T, f64)> {
 ```rs
 pub fn new() -> Self {
     PriorityQueue {
-        heap: MinHeap { data: Vec::new() },
+        heap: MinHeap { data: Vec::new() },                                                         // C1: T = O(1)     Reason: Simple Initialization.
     }
 }
 ```
+Result: O(1)
 
 ### push(value)
 ```rs
 pub fn push(&mut self, value: T) {
-    self.heap.push(value)
+    self.heap.push(value)                                                                           // C1: T = 
 }
 ```
+Result: TBD
 
 ##### Heap
 ```rs
@@ -73,7 +76,10 @@ pub fn push(&mut self, value: T) {
     self.data.push(value);
     self.bubble_up(self.data.len() - 1);
 }
+```
+Result: TBD
 
+```rs
 fn bubble_up(&mut self, mut idx: usize) {
     while idx > 0 {
         let parent = (idx - 1) / 2;
@@ -86,6 +92,7 @@ fn bubble_up(&mut self, mut idx: usize) {
     }
 }
 ```
+Result: TBD
 
 ### pop()
 ```rs
@@ -93,6 +100,7 @@ pub fn pop(&mut self) -> Option<T> {
     self.heap.pop()
 }
 ```
+Result: TBD
 
 ##### Heap
 ```rs
@@ -108,7 +116,10 @@ pub fn pop(&mut self) -> Option<T> {
     self.bubble_down(0);
     Some(root)
 }
+```
+Result: TBD
 
+```rs
 fn bubble_down(&mut self, mut idx: usize) {
     let len = self.data.len();
     loop {
@@ -131,6 +142,7 @@ fn bubble_down(&mut self, mut idx: usize) {
     }
 }
 ```
+Result: TBD
 
 ### is_empty()
 ```rs
@@ -138,6 +150,7 @@ pub fn is_empty(&self) -> bool {
     self.heap.is_empty()
 }
 ```
+Result: TBD
 
 ##### Heap
 ```rs
@@ -145,6 +158,7 @@ pub fn is_empty(&self) -> bool {
     self.data.is_empty()
 }
 ```
+Result: TBD
 
 
 ## HashTable<K, V>
@@ -166,6 +180,7 @@ pub fn new() -> Self {
     }
 }
 ```
+Result: TBD
 
 ### insert(key, value)
 ```rs
@@ -194,6 +209,7 @@ pub fn insert(&mut self, key: K, value: V) -> Result<(), HashTableError> {
     }
 }
 ```
+Result: TBD
 
 ### get(key)
 ```rs
@@ -225,6 +241,7 @@ pub fn get(&self, key: &K) -> Result<&V, HashTableError> {
     }
 }
 ```
+Result: TBD
 
 ### contains(key)
 ```rs
@@ -267,6 +284,7 @@ pub fn contains(&self, key: &K) -> bool {
     }
 }
 ```
+Result: TBD
 
 #### Annotate your A* algorithm with cost and times for each line 
 ##### (For statements that call methods on your data structures, the costs will be those determined above.)
@@ -342,6 +360,7 @@ fn a_star(
     Err(AStarError::NoPathFound)
 }
 ```
+Result: TBD
 
 ### heuristic(goal, current)
 ```rs
@@ -351,6 +370,7 @@ fn heuristic(goal: &Location, current: &Location) -> f64 {
     (dx * dx + dy * dy).sqrt()
 }
 ```
+Result: TBD
 
 ### reconstruct_path(came_from, start, goal)
 ```rs
@@ -374,6 +394,7 @@ fn reconstruct_path(
     path
 }
 ```
+Result: TBD
 
 #### Estimate best case, worst case, and expected running times for your A* implementation.
 ##### (Base this on your annotations and then summarize using asymptotic notation.)
