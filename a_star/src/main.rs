@@ -315,7 +315,7 @@ fn a_star(
         let neighbors = graph.get_neighbors(current.clone());
 
         for (next, edge_cost) in neighbors {
-            // current_cost: read from cost_so_far (HashTable::get returns Result<&f64, _>)
+            // current_cost: read from cost_so_far
             let current_cost = match cost_so_far.get(&current) {
                 Ok(v) => *v,
                 Err(_) => f64::INFINITY,
@@ -330,11 +330,11 @@ fn a_star(
             };
 
             if new_cost < old_cost {
-                // update cost_so_far and came_from — ignore insert errors (they are not fatal here)
+                // update cost_so_far and came_from (ignoring errors as not fatal here)
                 cost_so_far.insert(next.clone(), new_cost).ok();
                 came_from.insert(next.clone(), current.clone()).ok();
 
-                // push with tuple-constructor for OrderedFloat
+                // push
                 frontier.push(PriorityLocation {
                     location: next.clone(),
                     priority: OrderedFloat(new_cost + heuristic(&goal, &next)),

@@ -45,8 +45,8 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
     ///
     /// Returns bool
     ///
-    pub fn contains_vertex(&self, v: &T) -> bool {
-        self.adj_list.contains(v)
+    pub fn contains_vertex(&self, vertex: &T) -> bool {
+        self.adj_list.contains(vertex)
     }
 
     /// add_vertex()
