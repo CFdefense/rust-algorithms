@@ -136,8 +136,8 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
 
 #[cfg(test)]
 mod tests {
-    use std::vec;
     use super::*;
+    use std::vec;
 
     #[test]
     fn test_graph() {
@@ -151,9 +151,9 @@ mod tests {
         assert!(graph.add_vertex("six").is_ok());
 
         // Add some edges: from -> to
-        assert!(graph.add_edge("one", "five", 1.0).is_ok());   // one -> five
-        assert!(graph.add_edge("two", "one", 3.0).is_ok());    // two -> one
-        assert!(graph.add_edge("three", "two", 4.0).is_ok());  // three -> two
+        assert!(graph.add_edge("one", "five", 1.0).is_ok()); // one -> five
+        assert!(graph.add_edge("two", "one", 3.0).is_ok()); // two -> one
+        assert!(graph.add_edge("three", "two", 4.0).is_ok()); // three -> two
         assert!(graph.add_edge("three", "five", 2.0).is_ok()); // three -> five
 
         // Add some bad edges
@@ -170,7 +170,10 @@ mod tests {
         assert_eq!(graph.get_neighbors("six"), vec![]);
 
         // Test get_weight (from, to)
-        assert_eq!(graph.get_weight("five", "one").unwrap(), vec![("five", 1.0)]);
+        assert_eq!(
+            graph.get_weight("five", "one").unwrap(),
+            vec![("five", 1.0)]
+        );
         assert!(graph.get_weight("five", "two").is_err()); // No edge exists
     }
 }
