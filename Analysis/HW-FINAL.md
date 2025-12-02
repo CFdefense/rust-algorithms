@@ -32,12 +32,14 @@ The analysis below assumes that the generic type `T` provides only the minimal t
 ### contains_vertex(vertex)
 ```rs
 pub fn contains_vertex(&self, vertex: &T) -> bool {                                                 
-    self.adj_list.contains(vertex)                                                                  // C1: T = O(1)     Reason: Hash Lookup
+    self.adj_list.contains(vertex)                                                                  // C1: T = F(contains()) = O(m · |Location|)
 }
 ```
-Result: O(1)
+Worst: O(m · |Location|)
+Average: O(|Location|)
+Best: O(|Location|)
 
-##### See Hash Table .contains() @ HashTable<K, V> Below
+##### See Hash Table contains() @ HashTable<K, V> Below
 
 ### get_neighbors(vertex)
 ```rs
@@ -48,7 +50,9 @@ pub fn get_neighbors(&self, vertex: T) -> Vec<(T, f64)> {
         .unwrap_or_else(|_| Vec::new())                                                             // C3: T = O(1)     Reason: Unwrap operation and vector init both O(1)
 }
 ```
-Result: O(k) where k is v.neighbors
+Worst: O(k · |Location|)
+Average: O(k · |Location|)
+Best: O(1)
 
 ## PriorityQueue<T>
 
@@ -60,7 +64,9 @@ pub fn new() -> Self {
     }
 }
 ```
-Result: O(1)
+Worst: O(1)
+Average: O(1)
+Best: O(1)
 
 ### push(value)
 ```rs
@@ -351,70 +357,75 @@ fn a_star(
     goal: Location,
 ) -> Result<Vec<Location>, AStarError> {
     // Validate that start and goal exist in the graph
-    if !graph.contains_vertex(&start) || !graph.contains_vertex(&goal) {
-        return Err(AStarError::InvalidStartOrGoal);
+    if !graph.contains_vertex(&start) || !graph.contains_vertex(&goal) {                            // C1: T = 2F(contains()) = 2(O(|Location|))
+        return Err(AStarError::InvalidStartOrGoal);                                                 // C2: T = O(0..1)      Reason: Happens at most once
     }
 
     // Create our queue frontier
-    let mut frontier = PriorityQueue::<PriorityLocation>::new();
+    let mut frontier = PriorityQueue::<PriorityLocation>::new();                                    // C3: T = O(F(PriorityQueue::new)) = O(1)
 
     // Add the first location with priority 0.0
-    frontier.push(PriorityLocation {
-        location: start.clone(),
-        priority: OrderedFloat(0.0),
+    frontier.push(PriorityLocation {                                                                // C4: T = O(1) + O(log 1)      
+                                                                                                    // Reason: Initial push, heap has 0 elements
+        location: start.clone(),                                                                    // C5: T = O(|Location|)        Reason: Clone of Location
+        priority: OrderedFloat(0.0),                                                                // C6: T = O(1)         Reason: Simple Assignment
     });
 
-    let mut came_from = HashTable::<Location, Location>::new();
-    let mut cost_so_far = HashTable::<Location, f64>::new();
+    let mut came_from = HashTable::<Location, Location>::new();                                     // C7: T = F(HashTable::new()) = O(m)
+    let mut cost_so_far = HashTable::<Location, f64>::new();                                        // C8: T = F(HashTable::new()) = O(m)
 
     // insert start cost = 0.0 (ignore insert error)
-    cost_so_far.insert(start.clone(), 0.0).ok();
-
-    while !frontier.is_empty() {
-        let priority_loc = frontier.pop().ok_or(AStarError::NoPathFound)?;
-        let current = priority_loc.location;
+    cost_so_far.insert(start.clone(), 0.0).ok();                                                    // C9: T = O(|Location|) 
+                                                                                                    // Reason: insert best case for empty table
+    while !frontier.is_empty() {                                                                    // C10: T = O(1..n) 
+                                                                                                    // Reason: At least once, at most # nodes
+        let priority_loc = frontier.pop().ok_or(AStarError::NoPathFound)?;                          // C11: T = F(pop() = O(log n)
+        let current = priority_loc.location;                                                        // C12: T = O(1)    Simple Assignment
 
         // Goal reached
-        if current == goal {
-            return Ok(reconstruct_path(&came_from, start, goal));
+        if current == goal {                                                                        // C13: T = O(|Location|)    Reason: Compare Location Eq
+            return Ok(reconstruct_path(&came_from, start, goal));                                   // C14: T = F(reconstruct_path()) = O(p·|Location|) 
         }
 
         // Explore neighbors
-        let neighbors = graph.get_neighbors(current.clone());
+        let neighbors = graph.get_neighbors(current.clone());                                       // C15: T = F(get_neighbors()) = O(k·|Location|)
 
-        for (next, edge_cost) in neighbors {
+        for (next, edge_cost) in neighbors {                                                        // C16: T = O(k)    Reason: Iterating over neighbors
             // current_cost: read from cost_so_far
-            let current_cost = match cost_so_far.get(&current) {
-                Ok(v) => *v,
-                Err(_) => f64::INFINITY,
+            let current_cost = match cost_so_far.get(&current) {                                    // C17: T = F(get()) = O(|Location|
+                Ok(v) => *v,                                                                        // C18: T = O(1)    Reason: Simple Dereference
+                Err(_) => f64::INFINITY,                                                            // C19: T = O(1)    Reason: Simple Assignment
             };
 
-            let new_cost = current_cost + edge_cost;
+            let new_cost = current_cost + edge_cost;                                                // C20: T = O(1)    Reason: Simple Operation
 
             // old_cost: if not present treat as +inf
-            let old_cost = match cost_so_far.get(&next) {
-                Ok(v) => *v,
-                Err(_) => f64::INFINITY,
+            let old_cost = match cost_so_far.get(&next) {                                           // C21: T = F(get()) = O(|Location|
+                Ok(v) => *v,                                                                        // C22: T = O(1)    Reason: Simple Dereference
+                Err(_) => f64::INFINITY,                                                            // C23: T = O(1)    Reason: Simple Assignment
             };
 
-            if new_cost < old_cost {
+            if new_cost < old_cost {                                                                // C24: T = O(1) Reason: Simple Comparison
                 // update cost_so_far and came_from (ignoring errors as not fatal here)
-                cost_so_far.insert(next.clone(), new_cost).ok();
-                came_from.insert(next.clone(), current.clone()).ok();
+                cost_so_far.insert(next.clone(), new_cost).ok();                                    // C25: T = (F(insert()) = O(|Location|) + O(|Location|)
+                                                                                                    // Reason: insert() + cost of cloning next
+                came_from.insert(next.clone(), current.clone()).ok();                               // C26: T = (F(insert()) = O(|Location|) + O(2|Location|)
+                                                                                                    // Reason: insert() + cost of cloning next and current
 
                 // push
-                frontier.push(PriorityLocation {
-                    location: next.clone(),
-                    priority: OrderedFloat(new_cost + heuristic(&goal, &next)),
+                frontier.push(PriorityLocation {                                                    // C27: T = F(push()) = O(log n)
+                    location: next.clone(),                                                         // C28: T = O(|Location|) Reason: Clone Location
+                    priority: OrderedFloat(new_cost + heuristic(&goal, &next)),                     // C29: T = F(heuristic()) = O(1)
                 });
             }
         }
     }
 
-    Err(AStarError::NoPathFound)
+    Err(AStarError::NoPathFound)                                                                    // C30: T = O(0..1) 
+                                                                                                    // Reason: Happens at most once if no path
 }
 ```
-Result: TBD
+Result: See A* Search Analysis Section Below
 
 ### heuristic(goal, current)
 ```rs
@@ -454,11 +465,82 @@ Worst: O(p · |Location|)
 Average: O(p · |Location|)
 Best: O(|Location|) 
 
+## A* Search Analysis
+
 #### Estimate best case, worst case, and expected running times for your A* implementation.
 ##### (Base this on your annotations and then summarize using asymptotic notation.)
 
-### Best Case 
+#### Variables
+n → Number of nodes in the graph.
+
+k → Average number of neighbors for a node.
+
+p → Length of the path from start to goal.
+
+m → Size of the hash table used in came_from and cost_so_far.
+
+|Location| → Cost of hashing or comparing a Location struct.
 
 ### Worst Case
 
+#### Scenerio
+- Explores all nodes and all neighbors (full graph).
+- Each hash table get/insert takes O(|Location|).
+- Each heap operation is O(log n).
+
+#### Add up the Costs
+Worst = C1 + C2 + C3 + C4 + C5 + C6 + C7 + C8 + C9 + C10(n) * (C11 + C12 + C13 + C14 + C15(k) * (C17 + C18 + C19 + C20 + C21 + C22 + C23 + C24 + C25 + C26 + C27 + C28 + C29)) + C30
+
+#### Substitute the Times
+Worst = O(|Location|) + O(0..1) + O(1) + O(1) + O(|Location|) + O(1) + O(m) + O(m) + O(|Location|) + n * (O(|Location|) + O(1) + O(1) + O(1) + k * (O(|Location|) + O(|Location|) + O(1) + O(|Location|) + O(|Location|) + O(log n) + O(|Location|) + O(1) + O(|Location|) + O(0..1) + O(1) + O(1) + O(|Location|))) + O(0..1)
+
+#### Simplify and Sum
+Worst = O(n * k * |Location| + n * log n + m + p * |Location|)
+
+#### Drop constants
+Worst = O(n * k * |Location| + n * log n + m + p * |Location|)
+
 ### Average Case
+
+#### Scenerio
+- Explores roughly half the nodes (~n/2).
+- Explores roughly half the neighbors per node (~k/2).
+- Heap operations roughly log(frontier size) ≈ log(n).
+- Hash table operations as usual.
+
+#### Add up the Costs
+Average = C1 + C2 + C3 + C4 + C5 + C6 + C7 + C8 + C9 + C10(~n/2) * (C11 + C12 + C13 + C14 + C15(~k/2) * (C17 + C18 + C19 + C20 + C21 + C22 + C23 + C24 + C25 + C26 + C27 + C28 + C29)) + C30
+
+#### Substitute the Times
+Average = O(|Location|) + O(0..1) + O(1) + O(1) + O(|Location|) + O(1) + O(m) + O(m) + O(|Location|) + (n/2) * (O(|Location|) + O(1) + O(1) + O(1) + (k/2) * (O(|Location|) + O(|Location|) + O(1) + O(|Location|) + O(|Location|) + O(log n) + O(|Location|) + O(1) + O(|Location|) + O(0..1) + O(1) + O(1) + O(|Location|))) + O(0..1)
+
+#### Simplify and Sum
+Average = O(|Location| + m + n * k * |Location| + n * k * log n)
+
+#### Drop Constants
+Average = O(m + n * k * |Location| + n * k * log n)
+
+### Best Case 
+
+#### Scenerio
+- Goal is reached immediately (first pop).
+- Only first node explored.
+- Only one neighbor iteration happens.
+- Frontier has size 1.
+
+#### Add up the Costs
+Best = C1 + C2 + C3 + C4 + C5 + C6 + C7 + C8 + C9 + 
+       C10(1) + C11(1) + C12 + C13 + C14 + C15(1 neighbor) + 
+       C17 + C18 + C19 + C20 + C21 + C22 + C23 + C24 + 
+       C25 + C26 + C27 + C28 + C29 + C30(0..1)
+
+#### Substitute the Times
+Best = O(|Location|) + O(0..1) + O(1) + O(1) + O(|Location|) + O(1) + O(m) + O(m) + O(|Location|) +
+       O(1) + O(1) + O(1) + O(|Location|) + O(p·|Location|) + O(k·|Location|) + O(|Location|) + O(1) + O(1) + O(1) + 
+       O(|Location|) + O(|Location|) + O(log 1) + O(|Location|) + O(1) + O(|Location|) + O(0..1)
+
+#### Simplify and Sum
+Best = O(m + |Location| + p·|Location| + k·|Location| + log 1)
+
+#### Drop constants
+Best = O(m + p·|Location| + k·|Location|)
