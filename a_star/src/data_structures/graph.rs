@@ -39,6 +39,16 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
         }
     }
 
+    /// contains_vertex()
+    ///
+    /// Checks if a specific vertex exists
+    ///
+    /// Returns bool
+    ///
+    pub fn contains_vertex(&self, v: &T) -> bool {
+        self.adj_list.contains(v)
+    }
+
     /// add_vertex()
     ///
     /// Adds a new vertex to the graph.

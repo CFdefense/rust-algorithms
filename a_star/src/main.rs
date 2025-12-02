@@ -22,16 +22,15 @@ struct PriorityLocation {
     priority: OrderedFloat,
 }
 
-impl PartialOrd for PriorityLocation {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
+impl Ord for PriorityLocation {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.priority.cmp(&other.priority)
     }
 }
 
-impl Ord for PriorityLocation {
-    fn cmp(&self, other: &Self) -> Ordering {
-        // Reverse ordering for min-heap (lower priority first)
-        other.priority.cmp(&self.priority)
+impl PartialOrd for PriorityLocation {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 
@@ -48,7 +47,23 @@ impl PartialOrd for OrderedFloat {
 
 impl Ord for OrderedFloat {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(other).unwrap_or(Ordering::Equal)
+        let a = self.0;
+        let b = other.0;
+
+        // Handle NaN explicitly because total ordering requires it
+        if a.is_nan() && b.is_nan() {
+            return Ordering::Equal;
+        }
+        if a.is_nan() {
+            // place NaN last
+            return Ordering::Greater;
+        }
+        if b.is_nan() {
+            return Ordering::Less;
+        }
+
+        // Safe because neither is NaN
+        a.partial_cmp(&b).unwrap()
     }
 }
 
@@ -268,14 +283,14 @@ fn a_star(
     goal: Location,
 ) -> Result<Vec<Location>, AStarError> {
     // Validate that start and goal exist in the graph
-    if graph.get_neighbors(start.clone()).is_empty() && start != goal {
+    if !graph.contains_vertex(&start) || !graph.contains_vertex(&goal) {
         return Err(AStarError::InvalidStartOrGoal);
     }
 
     // Create our queue frontier
     let mut frontier = PriorityQueue::<PriorityLocation>::new();
 
-    // Add the first location
+    // Add the first location with priority 0.0
     frontier.push(PriorityLocation {
         location: start.clone(),
         priority: OrderedFloat(0.0),
@@ -284,6 +299,7 @@ fn a_star(
     let mut came_from = HashTable::<Location, Location>::new();
     let mut cost_so_far = HashTable::<Location, f64>::new();
 
+    // insert start cost = 0.0 (ignore insert error)
     cost_so_far.insert(start.clone(), 0.0).ok();
 
     while !frontier.is_empty() {
@@ -299,18 +315,30 @@ fn a_star(
         let neighbors = graph.get_neighbors(current.clone());
 
         for (next, edge_cost) in neighbors {
-            let current_cost = cost_so_far.get(&current).unwrap_or(&f64::INFINITY);
+            // current_cost: read from cost_so_far (HashTable::get returns Result<&f64, _>)
+            let current_cost = match cost_so_far.get(&current) {
+                Ok(v) => *v,
+                Err(_) => f64::INFINITY,
+            };
+
             let new_cost = current_cost + edge_cost;
 
-            // If we haven't visited this node or found a cheaper path
-            if !cost_so_far.contains(&next) || new_cost < *cost_so_far.get(&next).unwrap() {
+            // old_cost: if not present treat as +inf
+            let old_cost = match cost_so_far.get(&next) {
+                Ok(v) => *v,
+                Err(_) => f64::INFINITY,
+            };
+
+            if new_cost < old_cost {
+                // update cost_so_far and came_from — ignore insert errors (they are not fatal here)
                 cost_so_far.insert(next.clone(), new_cost).ok();
-                let priority = new_cost + heuristic(&goal, &next);
+                came_from.insert(next.clone(), current.clone()).ok();
+
+                // push with tuple-constructor for OrderedFloat
                 frontier.push(PriorityLocation {
                     location: next.clone(),
-                    priority: OrderedFloat(priority),
+                    priority: OrderedFloat(new_cost + heuristic(&goal, &next)),
                 });
-                came_from.insert(next.clone(), current.clone()).ok();
             }
         }
     }
@@ -346,12 +374,11 @@ fn reconstruct_path(
     let mut current = goal;
 
     while current != start {
-        if let Ok(prev) = came_from.get(&current) {
-            path.push(prev.clone());
-            current = prev.clone();
-        } else {
-            break;
-        }
+        let prev = came_from
+            .get(&current)
+            .expect("Path should exist in came_from");
+        current = prev.clone();
+        path.push(prev.clone());
     }
 
     path.reverse();
@@ -481,7 +508,7 @@ mod tests {
     }
 
     #[test]
-    fn test_create_graph_hub_and_spoke() {
+    fn test_create_graph_hub() {
         // Test a hub (Sun) connected to multiple planets
         let locations = vec![
             Location {
@@ -552,6 +579,99 @@ mod tests {
         // Distance should be 5 (3-4-5 triangle)
         let dist = heuristic(&loc2, &loc1);
         assert!((dist - 5.0).abs() < 0.001);
+    }
+    #[test]
+    fn test_a_star() {
+        // Test A* on a realistic 5-node graph with multiple paths
+        let locations = vec![
+            Location {
+                name: "A".to_string(),
+                lat: 0,
+                long: 0,
+            },
+            Location {
+                name: "B".to_string(),
+                lat: 5,
+                long: 0,
+            },
+            Location {
+                name: "C".to_string(),
+                lat: 10,
+                long: 0,
+            },
+            Location {
+                name: "D".to_string(),
+                lat: 5,
+                long: 5,
+            },
+            Location {
+                name: "E".to_string(),
+                lat: 10,
+                long: 5,
+            },
+        ];
+
+        let roads = vec![
+            (0, 1, 5.0), // A -> B
+            (1, 0, 5.0), // B -> A
+            (1, 2, 5.0), // B -> C
+            (2, 1, 5.0), // C -> B
+            (0, 3, 8.0), // A -> D
+            (3, 0, 8.0), // D -> A
+            (3, 4, 7.0), // D -> E
+            (4, 3, 7.0), // E -> D
+            (4, 2, 5.0), // E -> C
+            (2, 4, 5.0), // C -> E
+            (1, 3, 6.0), // B -> D
+            (3, 1, 6.0), // D -> B
+        ];
+
+        let graph = create_graph(&locations, roads).unwrap();
+
+        // Test path from A to C
+        let path = a_star(&graph, locations[0].clone(), locations[2].clone()).unwrap();
+
+        // Debug print
+        println!("Path found:");
+        for node in &path {
+            print!("{} -> ", node.name);
+        }
+        println!();
+
+        // Shortest path should be A -> B -> C (total cost: 10)
+        assert_eq!(path.len(), 3, "Expected 3 nodes but got {}", path.len());
+
+        // Shortest path should be A -> B -> C (total cost: 10)
+        assert_eq!(path.len(), 3);
+        assert_eq!(path[0].name, "A");
+        assert_eq!(path[1].name, "B");
+        assert_eq!(path[2].name, "C");
+
+        // Test path from A to E
+        let path2 = a_star(&graph, locations[0].clone(), locations[4].clone()).unwrap();
+
+        // Valid optimal paths:
+        // 1. A → B → C → E (4 nodes, cost 15)
+        // 2. A → D → E     (3 nodes, cost 15)
+
+        // Must start at A and end at E
+        assert_eq!(path2.first().unwrap().name, "A");
+        assert_eq!(path2.last().unwrap().name, "E");
+
+        // Path must be either 3 or 4 nodes
+        assert!(path2.len() == 3 || path2.len() == 4);
+
+        // Check validity more precisely:
+        let names: Vec<_> = path2.iter().map(|l| l.name.as_str()).collect();
+
+        let valid1 = names == ["A", "D", "E"];
+        let valid2 = names == ["A", "B", "C", "E"];
+
+        assert!(
+            valid1 || valid2,
+            "Path must be one of the optimal paths A→D→E or A→B→C→E. Got: {:?}",
+            names
+        );
     }
 
     #[test]
