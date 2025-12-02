@@ -12,6 +12,7 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
 #[derive(Clone)]
+#[allow(dead_code)]
 enum Slot<K, V> {
     Empty,          // Never used
     Tombstone,      // Deleted
@@ -186,6 +187,7 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
     ///
     /// Returns Result of Success or Error.
     ///
+    #[allow(dead_code)]
     pub fn remove(&mut self, key: &K) -> Result<(), HashTableError> {
         // Hash the key
         let mut hash_key = self.universal_hash(key);
@@ -278,6 +280,7 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
     ///
     /// Returns the total HashTable entries.
     ///
+    #[allow(dead_code)]
     pub fn len(&self) -> usize {
         self.len
     }
@@ -286,6 +289,7 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
     ///
     /// Returns True if the HashTable entries are 0, False otherwise.
     ///
+    #[allow(dead_code)]
     pub fn is_empty(&self) -> bool {
         self.len == 0
     }

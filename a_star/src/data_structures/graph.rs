@@ -19,6 +19,7 @@ pub enum GraphError {
     FromNotFound,
     ToNotFound,
     EdgeNotFound,
+    VertexNotFound,
 }
 
 pub struct WeightedDirectedGraph<T> {
@@ -63,7 +64,7 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
     ///
     /// Returns the Result of the Operation.
     ///
-    pub fn add_edge(&mut self, to: T, from: T, cost: f64) -> Result<(), GraphError> {
+    pub fn add_edge(&mut self, from: T, to: T, cost: f64) -> Result<(), GraphError> {
         // Confirm we have the vertices
         if !self.adj_list.contains(&from) {
             return Err(GraphError::FromNotFound);
@@ -72,7 +73,7 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
             return Err(GraphError::ToNotFound);
         }
 
-        // Add the edge
+        // Add the edge: from 'from' to 'to'
         let neighbors = self
             .adj_list
             .get_mut(&from)
@@ -88,7 +89,7 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
     ///
     /// Returns a list of the adjacent vertices.
     ///
-    fn get_neighbors(&self, vertex: T) -> Vec<(T, f64)> {
+    pub fn get_neighbors(&self, vertex: T) -> Vec<(T, f64)> {
         self.adj_list
             .get(&vertex)
             .map(|v| v.clone())
@@ -102,6 +103,7 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
     ///
     /// Returns the weight between two nodes
     ///
+    #[allow(dead_code)]
     fn get_weight(&self, to: T, from: T) -> Result<Vec<(T, f64)>, GraphError> {
         // Confirm we have the vertices
         if !self.adj_list.contains(&from) {
@@ -135,7 +137,6 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
 #[cfg(test)]
 mod tests {
     use std::vec;
-
     use super::*;
 
     #[test]
@@ -149,17 +150,17 @@ mod tests {
         assert!(graph.add_vertex("five").is_ok());
         assert!(graph.add_vertex("six").is_ok());
 
-        // Add some edges
-        assert!(graph.add_edge("one", "two", 3.0).is_ok());
-        assert!(graph.add_edge("two", "three", 4.0).is_ok());
-        assert!(graph.add_edge("five", "three", 2.0).is_ok());
-        assert!(graph.add_edge("five", "one", 1.0).is_ok());
+        // Add some edges: from -> to
+        assert!(graph.add_edge("one", "five", 1.0).is_ok());   // one -> five
+        assert!(graph.add_edge("two", "one", 3.0).is_ok());    // two -> one
+        assert!(graph.add_edge("three", "two", 4.0).is_ok());  // three -> two
+        assert!(graph.add_edge("three", "five", 2.0).is_ok()); // three -> five
 
         // Add some bad edges
         assert!(graph.add_edge("four", "two", 3.0).is_err());
         assert!(graph.add_edge("two", "four", 3.0).is_err());
 
-        // Get neighbors
+        // Get neighbors (edges going OUT from each vertex)
         assert_eq!(graph.get_neighbors("one"), vec![("five", 1.0)]);
         assert_eq!(
             graph.get_neighbors("three"),
@@ -168,8 +169,8 @@ mod tests {
         assert_eq!(graph.get_neighbors("two"), vec![("one", 3.0)]);
         assert_eq!(graph.get_neighbors("six"), vec![]);
 
-        // Test get_weight
-        assert_eq!(graph.get_weight("one", "two").unwrap(), vec![("one", 3.0)]);
-        assert!(graph.get_weight("one", "five").is_err()); // No edge exists
+        // Test get_weight (from, to)
+        assert_eq!(graph.get_weight("five", "one").unwrap(), vec![("five", 1.0)]);
+        assert!(graph.get_weight("five", "two").is_err()); // No edge exists
     }
 }

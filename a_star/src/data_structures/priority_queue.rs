@@ -33,6 +33,7 @@ impl<T: Default + PartialOrd> PriorityQueue<T> {
     ///
     /// Returns the length of the priority queue.
     ///
+    #[allow(dead_code)]
     pub fn len(&self) -> usize {
         self.heap.len()
     }
@@ -69,6 +70,7 @@ impl<T: Default + PartialOrd> PriorityQueue<T> {
     ///
     /// Returns an optional element from the back of Queue.
     ///
+    #[allow(dead_code)]
     pub fn peek(&self) -> Option<&T> {
         self.heap.peek()
     }
@@ -85,7 +87,8 @@ impl<T: Default + PartialOrd> MinHeap<T> {
     ///
     /// Returns an instance of the Min-Heap.
     ///
-    pub fn new() -> Self {
+    #[allow(dead_code)]
+    fn new() -> Self {
         MinHeap { data: Vec::new() }
     }
 
@@ -95,7 +98,8 @@ impl<T: Default + PartialOrd> MinHeap<T> {
     ///
     /// Returns the size of the Min-Heap vector.
     ///
-    pub fn len(&self) -> usize {
+    #[allow(dead_code)]
+    fn len(&self) -> usize {
         self.data.len()
     }
 

@@ -19,15 +19,17 @@ impl<T> Node<T> {
     ///
     /// Returns an instance of the Node.
     ///
-    pub fn new(value: T, next: Option<Box<Node<T>>>) -> Self {
+    fn new(value: T, next: Option<Box<Node<T>>>) -> Self {
         Node { value, next }
     }
 }
 
+#[allow(dead_code)]
 pub struct Stack<T> {
     head: Option<Box<Node<T>>>,
 }
 
+#[allow(dead_code)]
 impl<T> Stack<T> {
     /// new()
     ///
