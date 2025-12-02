@@ -346,44 +346,6 @@ fn pick_locations(locations: &Vec<Location>) -> (Location, Location) {
 ///
 /// Computes the shortest path between two Locations using A* Search Algorithm.
 ///
-/// ### Time Complexity:
-///
-/// Let `V` be the number of vertices and `E` be the number of edges in the graph.
-///
-/// The time complexity of A* is determined by the number of nodes expanded and the cost of maintaining the priority queue.
-/// In the worst case, A* explores every edge and vertex in the graph.
-///
-/// - **Priority Queue Operations:**
-///   - `push` (insertion): `O(log V)`
-///   - `pop` (extraction of min): `O(log V)`
-///
-/// - **Main Loop:**
-///   - The `while` loop runs as long as the frontier (priority queue) is not empty. In the worst case, every vertex is pushed and popped once.
-///   - For each vertex, we iterate through its neighbors. Over the entire execution, this means we examine each edge once.
-///
-/// Therefore, the time complexity is dominated by the priority queue operations, leading to:
-///
-/// **`O(E * log V)`**
-///
-/// In a dense graph where `E` is close to `V^2`, this becomes `O(V^2 * log V)`.
-///
-/// ### Space Complexity:
-///
-/// The space complexity is determined by the storage required for the data structures used:
-///
-/// - **`frontier` (Priority Queue):** In the worst case, all `V` vertices might be stored in the priority queue.
-///   - Space: `O(V)`
-/// - **`came_from` (Hash Table):** Stores the path predecessor for each visited vertex.
-///   - Space: `O(V)`
-/// - **`cost_so_far` (Hash Table):** Stores the cost to reach each visited vertex.
-///   - Space: `O(V)`
-///
-/// The total space complexity is the sum of these, which is:
-///
-/// **`O(V)`**
-///
-/// This is because all three data structures scale linearly with the number of vertices in the graph.
-///
 /// Returns the Result of the algorithm as a Path or an Error.
 ///
 fn a_star(
