@@ -11,6 +11,7 @@ use rand::Rng;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
+
 #[derive(Clone)]
 #[allow(dead_code)]
 enum Slot<K, V> {
@@ -19,11 +20,13 @@ enum Slot<K, V> {
     Occupied(K, V), // In-use
 }
 
+
 #[derive(Debug, PartialEq)]
 pub enum HashTableError {
     TableFull,
     KeyNotFound,
 }
+
 
 pub struct HashTable<K, V> {
     table: Vec<Slot<K, V>>,
@@ -33,6 +36,7 @@ pub struct HashTable<K, V> {
     m: usize,   // Max Table Size (Will use 101)
     len: usize, // Items in the table
 }
+
 
 impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
     /// new()
@@ -57,6 +61,7 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
             len,
         }
     }
+
 
     /// insert()
     ///
@@ -98,6 +103,7 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
             }
         }
     }
+
 
     /// get()
     ///
@@ -146,6 +152,7 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
         }
     }
 
+
     /// get_mut()
     ///
     /// Mutable version of get()
@@ -178,6 +185,7 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
             }
         }
     }
+
 
     /// remove()
     ///
@@ -229,6 +237,7 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
         }
     }
 
+
     /// contains()
     ///
     /// Will hash the key and look for the Slot.
@@ -276,6 +285,7 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
         }
     }
 
+
     /// len()
     ///
     /// Returns the total HashTable entries.
@@ -285,6 +295,7 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
         self.len
     }
 
+
     /// is_empty()
     ///
     /// Returns True if the HashTable entries are 0, False otherwise.
@@ -293,6 +304,7 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
     pub fn is_empty(&self) -> bool {
         self.len == 0
     }
+
 
     /// key_to_u64
     ///
@@ -309,6 +321,7 @@ impl<K: Hash + Clone + PartialEq, V: Clone> HashTable<K, V> {
         hasher.finish()
     }
 
+    
     /// universal_hash
     ///
     /// Hashes a key using our universal hashing function.

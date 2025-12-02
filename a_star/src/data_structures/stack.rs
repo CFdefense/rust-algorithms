@@ -12,6 +12,7 @@ struct Node<T> {
     pub next: Option<Box<Node<T>>>,
 }
 
+
 impl<T> Node<T> {
     /// new()
     ///
@@ -24,10 +25,12 @@ impl<T> Node<T> {
     }
 }
 
+
 #[allow(dead_code)]
 pub struct Stack<T> {
     head: Option<Box<Node<T>>>,
 }
+
 
 #[allow(dead_code)]
 impl<T> Stack<T> {
@@ -40,6 +43,7 @@ impl<T> Stack<T> {
     pub fn new() -> Self {
         Stack { head: None }
     }
+
 
     /// pop()
     ///
@@ -55,6 +59,7 @@ impl<T> Stack<T> {
             node.value // return old value
         })
     }
+
 
     /// push()
     ///
@@ -73,6 +78,7 @@ impl<T> Stack<T> {
         // Update the head
         self.head = Some(new);
     }
+
 
     /// len()
     ///
@@ -94,6 +100,7 @@ impl<T> Stack<T> {
         count
     }
 
+
     /// peek()
     ///
     /// Peek at the top (head) element of the Stack.
@@ -103,6 +110,7 @@ impl<T> Stack<T> {
     pub fn peek(&self) -> Option<&T> {
         self.head.as_deref().map(|node| &node.value)
     }
+
 
     /// is_empty()
     ///

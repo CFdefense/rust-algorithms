@@ -12,6 +12,7 @@
 use crate::data_structures::hash_table::HashTable;
 use std::hash::Hash;
 
+
 #[derive(Debug)]
 pub enum GraphError {
     VertexAlreadyExists,
@@ -22,9 +23,11 @@ pub enum GraphError {
     VertexNotFound,
 }
 
+
 pub struct WeightedDirectedGraph<T> {
     adj_list: HashTable<T, Vec<(T, f64)>>,
 }
+
 
 impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
     /// new()
@@ -39,6 +42,7 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
         }
     }
 
+
     /// contains_vertex()
     ///
     /// Checks if a specific vertex exists
@@ -48,6 +52,7 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
     pub fn contains_vertex(&self, vertex: &T) -> bool {
         self.adj_list.contains(vertex)
     }
+
 
     /// add_vertex()
     ///
@@ -66,6 +71,7 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
             Err(GraphError::VertexAlreadyExists)
         }
     }
+
 
     /// add_edge()
     ///
@@ -93,6 +99,7 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
         Ok(())
     }
 
+
     /// get_neighbors
     ///
     /// Gets the adjacent neighbors of a vertex.
@@ -106,6 +113,7 @@ impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
             .unwrap_or_else(|_| Vec::new())
     }
 
+    
     /// get_weight()
     ///
     /// Finds and returns the weight between two nodes.

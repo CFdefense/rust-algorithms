@@ -9,6 +9,14 @@ use crate::data_structures::{
     priority_queue::PriorityQueue,
 };
 
+
+#[derive(Debug)]
+enum AStarError {
+    NoPathFound,
+    InvalidStartOrGoal,
+}
+
+
 #[derive(Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Default)]
 struct Location {
     name: String,
@@ -16,35 +24,83 @@ struct Location {
     long: u32,
 }
 
+
 #[derive(Clone, PartialEq, Eq, Default)]
 struct PriorityLocation {
     location: Location,
     priority: OrderedFloat,
 }
 
+
+#[derive(Clone, Copy, PartialEq, Default)]
+struct OrderedFloat(f64);
+
+
+/// Trait
+/// 
+/// Implementing Display for Location.
+/// This is how we tell Rust how to print Location objects.
+/// 
+impl fmt::Display for Location {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} (lat: {}, long: {})", self.name, self.lat, self.long)
+    }
+}
+
+
+/// Trait
+/// 
+/// Implementing Order for PriorityLocation.
+/// This is how we tell Rust how to compare PriorityLocation objects.
+/// 
 impl Ord for PriorityLocation {
     fn cmp(&self, other: &Self) -> Ordering {
         self.priority.cmp(&other.priority)
     }
 }
 
+
+/// Trait
+/// 
+/// Implementing Partial Ordering for PriorityLocation.
+/// This is how we tell Rust how to partially compare PriorityLocation objects.
+/// 
 impl PartialOrd for PriorityLocation {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Default)]
-struct OrderedFloat(f64);
 
+/// Trait
+/// 
+/// Declares that OrderedFloat has a total, reflexive equality relation.
+/// 
 impl Eq for OrderedFloat {}
 
+
+/// Trait
+/// 
+/// Implementing Partial Ordering for OrderedFloat.
+/// This is how we tell Rust how to partially compare OrderedFloat objects.
+/// 
 impl PartialOrd for OrderedFloat {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.0.partial_cmp(&other.0)
     }
 }
 
+
+/// Trait
+/// 
+/// Implementing Ordering for OrderedFloat.
+/// This is how we tell Rust how to compare OrderedFloat objects.
+/// Creates a total ordering for floating-point numbers.
+/// Rust normally forbids this.
+/// NaN is always placed last (Greater).
+/// Two NaNs are treated as equal.
+/// Otherwise, compare normally.
+/// 
 impl Ord for OrderedFloat {
     fn cmp(&self, other: &Self) -> Ordering {
         let a = self.0;
@@ -67,17 +123,6 @@ impl Ord for OrderedFloat {
     }
 }
 
-impl fmt::Display for Location {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} (lat: {}, long: {})", self.name, self.lat, self.long)
-    }
-}
-
-#[derive(Debug)]
-enum AStarError {
-    NoPathFound,
-    InvalidStartOrGoal,
-}
 
 ///
 /// A* Search
@@ -176,6 +221,7 @@ fn main() {
     }
 }
 
+
 /// create_graph()
 ///
 /// Creates a WeightedDirectedGraph of our defined locations.
@@ -208,6 +254,7 @@ fn create_graph(
 
     Ok(graph)
 }
+
 
 /// pick_locations
 ///
@@ -270,6 +317,7 @@ fn pick_locations(locations: &Vec<Location>) -> (Location, Location) {
         return (locations[a - 1].clone(), locations[b - 1].clone());
     }
 }
+
 
 /// a_star
 ///
@@ -346,6 +394,7 @@ fn a_star(
     Err(AStarError::NoPathFound)
 }
 
+
 /// heuristic
 ///
 /// Computes the straight-line distance between two locations.
@@ -358,6 +407,7 @@ fn heuristic(goal: &Location, current: &Location) -> f64 {
     let dy = (goal.long as i64 - current.long as i64).abs() as f64;
     (dx * dx + dy * dy).sqrt()
 }
+
 
 /// reconstruct_path
 ///
@@ -384,6 +434,7 @@ fn reconstruct_path(
     path.reverse();
     path
 }
+
 
 #[cfg(test)]
 mod tests {
@@ -463,6 +514,7 @@ mod tests {
         );
     }
 
+
     #[test]
     fn test_create_graph_bidirectional() {
         let locations = vec![
@@ -506,6 +558,7 @@ mod tests {
             "Jupiter should have route to Mars"
         );
     }
+
 
     #[test]
     fn test_create_graph_hub() {
@@ -563,6 +616,7 @@ mod tests {
         );
     }
 
+
     #[test]
     fn test_heuristic() {
         let loc1 = Location {
@@ -580,6 +634,8 @@ mod tests {
         let dist = heuristic(&loc2, &loc1);
         assert!((dist - 5.0).abs() < 0.001);
     }
+
+
     #[test]
     fn test_a_star() {
         // Test A* on a realistic 5-node graph with multiple paths
@@ -674,6 +730,7 @@ mod tests {
         );
     }
 
+
     #[test]
     fn test_a_star_simple_path() {
         let locations = vec![
@@ -707,6 +764,7 @@ mod tests {
         assert_eq!(path[1].name, "Venus");
         assert_eq!(path[2].name, "Earth");
     }
+
 
     #[test]
     fn test_a_star_optimal_path() {
@@ -744,6 +802,7 @@ mod tests {
         assert_eq!(path[1].name, "End");
     }
 
+    
     #[test]
     fn test_a_star_no_path() {
         let locations = vec![

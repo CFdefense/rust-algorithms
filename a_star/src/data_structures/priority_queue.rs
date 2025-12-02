@@ -29,6 +29,7 @@ impl<T: Default + PartialOrd> PriorityQueue<T> {
         }
     }
 
+
     /// len()
     ///
     /// Returns the length of the priority queue.
@@ -38,6 +39,7 @@ impl<T: Default + PartialOrd> PriorityQueue<T> {
         self.heap.len()
     }
 
+
     /// is_empty()
     ///
     /// Returns True if the priority queue is empty, False otherwise.
@@ -46,6 +48,7 @@ impl<T: Default + PartialOrd> PriorityQueue<T> {
         self.heap.is_empty()
     }
 
+
     /// push()
     ///
     /// Pushes a new value to the Queue.
@@ -53,6 +56,7 @@ impl<T: Default + PartialOrd> PriorityQueue<T> {
     pub fn push(&mut self, value: T) {
         self.heap.push(value)
     }
+
 
     /// pop()
     ///
@@ -63,6 +67,7 @@ impl<T: Default + PartialOrd> PriorityQueue<T> {
     pub fn pop(&mut self) -> Option<T> {
         self.heap.pop()
     }
+
 
     /// peek()
     ///
@@ -92,6 +97,7 @@ impl<T: Default + PartialOrd> MinHeap<T> {
         MinHeap { data: Vec::new() }
     }
 
+
     /// len()
     ///
     /// Calculate the length of the Min-Heap.
@@ -103,6 +109,7 @@ impl<T: Default + PartialOrd> MinHeap<T> {
         self.data.len()
     }
 
+
     /// is_empty()
     ///
     /// Returns True if the Min-Heap is empty, False otherwise.
@@ -110,6 +117,7 @@ impl<T: Default + PartialOrd> MinHeap<T> {
     pub fn is_empty(&self) -> bool {
         self.data.len() == 0
     }
+
 
     /// peek()
     ///
@@ -120,6 +128,7 @@ impl<T: Default + PartialOrd> MinHeap<T> {
     pub fn peek(&self) -> Option<&T> {
         self.data.first()
     }
+
 
     /// push()
     ///
@@ -132,6 +141,7 @@ impl<T: Default + PartialOrd> MinHeap<T> {
         self.data.push(value);
         self.bubble_up();
     }
+
 
     /// pop()
     ///
@@ -163,6 +173,7 @@ impl<T: Default + PartialOrd> MinHeap<T> {
         min
     }
 
+
     /// bubble_up()
     ///
     /// Fix-up operation to move a newly inserted element to its proper location.
@@ -187,6 +198,7 @@ impl<T: Default + PartialOrd> MinHeap<T> {
         }
     }
 
+    
     /// bubble_down()
     ///
     /// Fix-up operation that occurs when the root of the tree is deleted.
@@ -266,6 +278,7 @@ mod tests {
         assert_eq!(priority_queue.is_empty(), true);
     }
 
+    
     #[test]
     fn test_min_heap() {
         // Create a new Min-Heap
