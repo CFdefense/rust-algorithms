@@ -10,14 +10,6 @@
 This repository contains assignments and project submissions for **CMPT 435L – Data Structures and Algorithms**.  
 All work in this repository reflects my solutions and understanding of course material.
 
-## Academic integrity / disclaimer
-
-- **Do not copy**: This repository is provided for **reference only**.
-- **Write your own solution**: If you're a student in this course (or a similar course), do your own work and follow your instructor’s collaboration/academic integrity policy.
-- **Use responsibly**: You may use this to understand concepts, but **do not submit any of this code as your own**.
-
----
-
 ## Assignments
 
 - [x] Assignment 1: `hello_world` — basic Rust project setup / “hello world” starter.
@@ -49,6 +41,10 @@ cd hello_world && cargo run
 
 ---
 
-## Notes / writeups
+## Academic integrity / disclaimer
 
-- `Analysis/` — course notes and resources (weekly markdown notes, images, and the final writeup).
+- **Do not copy**: This repository is provided for **reference only**.
+- **Write your own solution**: If you're a student in this course (or a similar course), do your own work and follow your instructor’s collaboration/academic integrity policy.
+- **Use responsibly**: You may use this to understand concepts, but **do not submit any of this code as your own**.
+
+---
