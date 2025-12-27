@@ -1,8 +1,6 @@
 # CMPT 435L – Data Structures and Algorithms
 
-**Student:** Christian Farrell
-
-**Instructor:** Prof. Matthew Johnson
+**Student:** Christian Farrell  ---  **Instructor:** Prof. Matthew Johnson
 
 ---
 
