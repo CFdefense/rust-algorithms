@@ -23,7 +23,7 @@ All work in this repository reflects my solutions and understanding of course ma
 - [x] Assignment 1: `hello_world` — basic Rust project setup / “hello world” starter.
 - [x] Assignment 2: `simple_bfs` — a simple breadth-first search (BFS) traversal example.
 - [x] Assignment 3: `self_balancing_bst` — self-balancing BST work (tree rotations / balancing logic).
-- [x] Assignment 4: `dfs_edge_classification` — depth-first search (DFS) with edge classification (e.g., tree/back/forward/cross).
+- [x] Assignment 4: `dfs_edge_classification` — depth-first search (DFS) with edge classification.
 - [x] Assignment 5: `a_star` — A\* pathfinding plus supporting data structures (graph / priority queue / etc.).
 
 _(This list will be updated as assignments are completed and submitted.)_
