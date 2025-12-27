@@ -24,7 +24,7 @@ All work in this repository reflects my solutions and understanding of course ma
 - [x] Assignment 2: `simple_bfs` — a simple breadth-first search (BFS) traversal example.
 - [x] Assignment 3: `self_balancing_bst` — self-balancing BST work (tree rotations / balancing logic).
 - [x] Assignment 4: `dfs_edge_classification` — depth-first search (DFS) with edge classification.
-- [x] Assignment 5: `a_star` — A\* pathfinding plus supporting data structures (graph / priority queue / etc.).
+- [x] Assignment 5: `a_star` — A\* pathfinding plus supporting custom generic data structure implementations (graph/priority queue/etc).
 
 _(This list will be updated as assignments are completed and submitted.)_
 
