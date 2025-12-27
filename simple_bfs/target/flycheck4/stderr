@@ -1,0 +1,10 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   0.070706542s  INFO prepare_target{force=false package_id=simple_bfs v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/simple_bfs) target="simple_bfs"}: cargo::core::compiler::fingerprint: fingerprint dirty for simple_bfs v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/simple_bfs)/Check { test: false }/TargetInner { name: "simple_bfs", doc: true, ..: with_path("/Users/cfarrell/Documents/rust-algorithms/simple_bfs/src/main.rs", Edition2021) }
+   0.070730917s  INFO prepare_target{force=false package_id=simple_bfs v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/simple_bfs) target="simple_bfs"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
+   0.071245208s  INFO prepare_target{force=false package_id=simple_bfs v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/simple_bfs) target="simple_bfs"}: cargo::core::compiler::fingerprint: fingerprint dirty for simple_bfs v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/simple_bfs)/Check { test: true }/TargetInner { name: "simple_bfs", doc: true, ..: with_path("/Users/cfarrell/Documents/rust-algorithms/simple_bfs/src/main.rs", Edition2021) }
+   0.071257458s  INFO prepare_target{force=false package_id=simple_bfs v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/simple_bfs) target="simple_bfs"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
+    Checking simple_bfs v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/simple_bfs)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.15s

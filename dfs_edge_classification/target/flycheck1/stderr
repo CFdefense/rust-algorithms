@@ -1,0 +1,9 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   0.074871708s  INFO prepare_target{force=false package_id=dfs_edge_classification v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/dfs_edge_classification) target="dfs_edge_classification"}: cargo::core::compiler::fingerprint: fingerprint dirty for dfs_edge_classification v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/dfs_edge_classification)/Check { test: false }/TargetInner { name: "dfs_edge_classification", doc: true, ..: with_path("/Users/cfarrell/Documents/rust-algorithms/dfs_edge_classification/src/main.rs", Edition2024) }
+   0.074884375s  INFO prepare_target{force=false package_id=dfs_edge_classification v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/dfs_edge_classification) target="dfs_edge_classification"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
+   0.075243792s  INFO prepare_target{force=false package_id=dfs_edge_classification v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/dfs_edge_classification) target="dfs_edge_classification"}: cargo::core::compiler::fingerprint: fingerprint dirty for dfs_edge_classification v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/dfs_edge_classification)/Check { test: true }/TargetInner { name: "dfs_edge_classification", doc: true, ..: with_path("/Users/cfarrell/Documents/rust-algorithms/dfs_edge_classification/src/main.rs", Edition2024) }
+   0.075250208s  INFO prepare_target{force=false package_id=dfs_edge_classification v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/dfs_edge_classification) target="dfs_edge_classification"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
+    Checking dfs_edge_classification v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/dfs_edge_classification)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.16s
