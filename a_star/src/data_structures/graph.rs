@@ -1,0 +1,208 @@
+/*
+    WeightedDirectedGraph
+        use an adjacency-list edge representation
+
+    Adjacency List
+        each node has a
+
+    Note
+        Each class must have a static function that performs a unit test of the class by instantiating and and calling the methods of the class.
+*/
+
+
+use crate::data_structures::hash_table::HashTable;
+use std::hash::Hash;
+
+
+/// GraphError
+/// 
+/// An Error Type for all errors a Graph can expect during operations.
+/// 
+#[derive(Debug)]
+pub enum GraphError {
+    VertexAlreadyExists,
+    GraphFull,
+    FromNotFound,
+    ToNotFound,
+    EdgeNotFound,
+    VertexNotFound,
+}
+
+
+/// WeightedDirectedGraph<T>
+/// 
+/// WeightedDirectedGraph Implemented via adjancency list
+/// Uses a HashTable as its backing which maps type T to f64 weight
+/// 
+pub struct WeightedDirectedGraph<T> {
+    adj_list: HashTable<T, Vec<(T, f64)>>,
+}
+
+
+impl<T: Hash + Clone + PartialEq> WeightedDirectedGraph<T> {
+    /// new()
+    ///
+    /// Creates a new instance of a WeightedDirectedGraph.
+    ///
+    /// Returns an instance of a WeightedDirectedGraph.
+    ///
+    pub fn new() -> Self {
+        WeightedDirectedGraph {
+            adj_list: HashTable::<T, Vec<(T, f64)>>::new(),
+        }
+    }
+
+
+    /// contains_vertex()
+    ///
+    /// Checks if a specific vertex exists
+    ///
+    /// Returns bool
+    ///
+    pub fn contains_vertex(&self, vertex: &T) -> bool {
+        self.adj_list.contains(vertex)
+    }
+
+
+    /// add_vertex()
+    ///
+    /// Adds a new vertex to the graph.
+    /// Initializes the Node and an empty list to go along with it.
+    ///
+    /// Returns the Result of the operation.
+    ///
+    pub fn add_vertex(&mut self, id: T) -> Result<(), GraphError> {
+        if !self.adj_list.contains(&id) {
+            self.adj_list
+                .insert(id, Vec::new())
+                .map_err(|_| GraphError::GraphFull)?;
+            Ok(())
+        } else {
+            Err(GraphError::VertexAlreadyExists)
+        }
+    }
+
+
+    /// add_edge()
+    ///
+    /// Adds a new edge to the adjacency list.
+    /// From and To should exist in the HashMap.
+    ///
+    /// Returns the Result of the Operation.
+    ///
+    pub fn add_edge(&mut self, from: T, to: T, cost: f64) -> Result<(), GraphError> {
+        // Confirm we have the vertices
+        if !self.adj_list.contains(&from) {
+            return Err(GraphError::FromNotFound);
+        }
+        if !self.adj_list.contains(&to) {
+            return Err(GraphError::ToNotFound);
+        }
+
+        // Add the edge: from 'from' to 'to'
+        let neighbors = self
+            .adj_list
+            .get_mut(&from)
+            .map_err(|_| GraphError::FromNotFound)?;
+        neighbors.push((to, cost));
+
+        Ok(())
+    }
+
+
+    /// get_neighbors
+    ///
+    /// Gets the adjacent neighbors of a vertex.
+    ///
+    /// Returns a list of the adjacent vertices.
+    ///
+    pub fn get_neighbors(&self, vertex: T) -> Vec<(T, f64)> {
+        self.adj_list
+            .get(&vertex)
+            .map(|v| v.clone())
+            .unwrap_or_else(|_| Vec::new())
+    }
+
+
+    /// get_weight()
+    ///
+    /// Finds and returns the weight between two nodes.
+    /// From and To should exist in the HashMap.
+    ///
+    /// Returns the weight between two nodes
+    ///
+    #[allow(dead_code)]
+    fn get_weight(&self, to: T, from: T) -> Result<Vec<(T, f64)>, GraphError> {
+        // Confirm we have the vertices
+        if !self.adj_list.contains(&from) {
+            return Err(GraphError::FromNotFound);
+        }
+        if !self.adj_list.contains(&to) {
+            return Err(GraphError::ToNotFound);
+        }
+
+        // Get the adjacency list for `from`
+        let neighbors = self
+            .adj_list
+            .get(&from)
+            .map_err(|_| GraphError::FromNotFound)?;
+
+        // Filter edges to `to` and collect
+        let edges: Vec<(T, f64)> = neighbors
+            .iter()
+            .filter(|(neighbor, _)| *neighbor == to)
+            .map(|(neighbor, weight)| (neighbor.clone(), *weight))
+            .collect();
+
+        if edges.is_empty() {
+            Err(GraphError::EdgeNotFound)
+        } else {
+            Ok(edges)
+        }
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::vec;
+
+    #[test]
+    fn test_graph() {
+        let mut graph = WeightedDirectedGraph::<&str>::new();
+
+        // Add some vertices
+        assert!(graph.add_vertex("one").is_ok());
+        assert!(graph.add_vertex("two").is_ok());
+        assert!(graph.add_vertex("three").is_ok());
+        assert!(graph.add_vertex("five").is_ok());
+        assert!(graph.add_vertex("six").is_ok());
+
+        // Add some edges: from -> to
+        assert!(graph.add_edge("one", "five", 1.0).is_ok()); // one -> five
+        assert!(graph.add_edge("two", "one", 3.0).is_ok()); // two -> one
+        assert!(graph.add_edge("three", "two", 4.0).is_ok()); // three -> two
+        assert!(graph.add_edge("three", "five", 2.0).is_ok()); // three -> five
+
+        // Add some bad edges
+        assert!(graph.add_edge("four", "two", 3.0).is_err());
+        assert!(graph.add_edge("two", "four", 3.0).is_err());
+
+        // Get neighbors (edges going OUT from each vertex)
+        assert_eq!(graph.get_neighbors("one"), vec![("five", 1.0)]);
+        assert_eq!(
+            graph.get_neighbors("three"),
+            vec![("two", 4.0), ("five", 2.0)]
+        );
+        assert_eq!(graph.get_neighbors("two"), vec![("one", 3.0)]);
+        assert_eq!(graph.get_neighbors("six"), vec![]);
+
+        // Test get_weight (from, to)
+        assert_eq!(
+            graph.get_weight("five", "one").unwrap(),
+            vec![("five", 1.0)]
+        );
+        assert!(graph.get_weight("five", "two").is_err()); // No edge exists
+    }
+}
