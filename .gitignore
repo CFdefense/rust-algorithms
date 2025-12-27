@@ -4,14 +4,8 @@ target/
 .rustc_info.json
 **/*.rs.bk
 
-# This repo contains multiple small binary crates; keep lockfiles out of git.
-Cargo.lock
-
 # Rust Analyzer / tooling
 rust-project.json
-
-# If this is a binary-only project, keep Cargo.lock ignored.
-# For libraries, you may want to COMMIT Cargo.lock.
 
 # === IDEs ===
 .vscode/
