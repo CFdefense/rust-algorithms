@@ -1,0 +1,28 @@
+# === Rust / Cargo ===
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# If this is a binary-only project, keep Cargo.lock ignored.
+# For libraries, you may want to COMMIT Cargo.lock.
+
+# === IDEs ===
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# === OS files ===
+.DS_Store
+Thumbs.db
+
+# === Logs ===
+*.log
+
+# === Compiled artifacts ===
+*.out
+*.exe
+
+# === Coverage / profiling ===
+*.profraw
+*.profdata

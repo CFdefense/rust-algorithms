@@ -1,34 +1,4 @@
     Blocking waiting for file lock on package cache
     Blocking waiting for file lock on package cache
     Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
-   0.069149250s  INFO prepare_target{force=false package_id=a_star v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/a_star) target="a_star"}: cargo::core::compiler::fingerprint: fingerprint dirty for a_star v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/a_star)/Check { test: false }/TargetInner { name: "a_star", doc: true, ..: with_path("/Users/cfarrell/Documents/rust-algorithms/a_star/src/main.rs", Edition2024) }
-   0.069158000s  INFO prepare_target{force=false package_id=a_star v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/a_star) target="a_star"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
-   0.069319042s  INFO prepare_target{force=false package_id=rand v0.8.5 target="rand"}: cargo::core::compiler::fingerprint: fingerprint dirty for rand v0.8.5/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("rand", ["lib"], "/Users/cfarrell/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand-0.8.5/src/lib.rs", Edition2018) }
-   0.069322875s  INFO prepare_target{force=false package_id=rand v0.8.5 target="rand"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
-   0.069497625s  INFO prepare_target{force=false package_id=libc v0.2.177 target="libc"}: cargo::core::compiler::fingerprint: fingerprint dirty for libc v0.2.177/Check { test: false }/TargetInner { ..: lib_target("libc", ["lib"], "/Users/cfarrell/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libc-0.2.177/src/lib.rs", Edition2021) }
-   0.069501708s  INFO prepare_target{force=false package_id=libc v0.2.177 target="libc"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
-   0.069775500s  INFO prepare_target{force=false package_id=rand_chacha v0.3.1 target="rand_chacha"}: cargo::core::compiler::fingerprint: fingerprint dirty for rand_chacha v0.3.1/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("rand_chacha", ["lib"], "/Users/cfarrell/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand_chacha-0.3.1/src/lib.rs", Edition2018) }
-   0.069779083s  INFO prepare_target{force=false package_id=rand_chacha v0.3.1 target="rand_chacha"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
-   0.069927500s  INFO prepare_target{force=false package_id=ppv-lite86 v0.2.21 target="ppv_lite86"}: cargo::core::compiler::fingerprint: fingerprint dirty for ppv-lite86 v0.2.21/Check { test: false }/TargetInner { ..: lib_target("ppv_lite86", ["lib"], "/Users/cfarrell/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/lib.rs", Edition2021) }
-   0.069930917s  INFO prepare_target{force=false package_id=ppv-lite86 v0.2.21 target="ppv_lite86"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
-   0.070059833s  INFO prepare_target{force=false package_id=zerocopy v0.8.30 target="zerocopy"}: cargo::core::compiler::fingerprint: fingerprint dirty for zerocopy v0.8.30/Check { test: false }/TargetInner { ..: lib_target("zerocopy", ["lib"], "/Users/cfarrell/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zerocopy-0.8.30/src/lib.rs", Edition2021) }
-   0.070062417s  INFO prepare_target{force=false package_id=zerocopy v0.8.30 target="zerocopy"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
-   0.070319917s  INFO prepare_target{force=false package_id=rand_core v0.6.4 target="rand_core"}: cargo::core::compiler::fingerprint: fingerprint dirty for rand_core v0.6.4/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("rand_core", ["lib"], "/Users/cfarrell/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand_core-0.6.4/src/lib.rs", Edition2018) }
-   0.070324042s  INFO prepare_target{force=false package_id=rand_core v0.6.4 target="rand_core"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
-   0.070500000s  INFO prepare_target{force=false package_id=getrandom v0.2.16 target="getrandom"}: cargo::core::compiler::fingerprint: fingerprint dirty for getrandom v0.2.16/Check { test: false }/TargetInner { ..: lib_target("getrandom", ["lib"], "/Users/cfarrell/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.16/src/lib.rs", Edition2018) }
-   0.070506417s  INFO prepare_target{force=false package_id=getrandom v0.2.16 target="getrandom"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
-   0.070749083s  INFO prepare_target{force=false package_id=cfg-if v1.0.4 target="cfg_if"}: cargo::core::compiler::fingerprint: fingerprint dirty for cfg-if v1.0.4/Check { test: false }/TargetInner { ..: lib_target("cfg_if", ["lib"], "/Users/cfarrell/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cfg-if-1.0.4/src/lib.rs", Edition2018) }
-   0.070754750s  INFO prepare_target{force=false package_id=cfg-if v1.0.4 target="cfg_if"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
-   0.070917750s  INFO prepare_target{force=false package_id=a_star v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/a_star) target="a_star"}: cargo::core::compiler::fingerprint: fingerprint dirty for a_star v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/a_star)/Check { test: true }/TargetInner { name: "a_star", doc: true, ..: with_path("/Users/cfarrell/Documents/rust-algorithms/a_star/src/main.rs", Edition2024) }
-   0.070923708s  INFO prepare_target{force=false package_id=a_star v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/a_star) target="a_star"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
-    Checking cfg-if v1.0.4
-    Checking libc v0.2.177
-    Checking zerocopy v0.8.30
-    Checking getrandom v0.2.16
-    Checking rand_core v0.6.4
-    Checking ppv-lite86 v0.2.21
-    Checking rand_chacha v0.3.1
-    Checking rand v0.8.5
-    Checking a_star v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/a_star)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.13s
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.07s

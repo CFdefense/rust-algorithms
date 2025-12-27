@@ -1,13 +1,3 @@
     Blocking waiting for file lock on package cache
     Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
-   0.075883625s  INFO prepare_target{force=false package_id=hello_world v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/hello_world) target="hello_world"}: cargo::core::compiler::fingerprint: fingerprint dirty for hello_world v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/hello_world)/Check { test: false }/TargetInner { name: "hello_world", doc: true, ..: with_path("/Users/cfarrell/Documents/rust-algorithms/hello_world/src/main.rs", Edition2024) }
-   0.075892292s  INFO prepare_target{force=false package_id=hello_world v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/hello_world) target="hello_world"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
-   0.076137583s  INFO prepare_target{force=false package_id=text-to-ascii-art v0.1.10 target="text_to_ascii_art"}: cargo::core::compiler::fingerprint: fingerprint dirty for text-to-ascii-art v0.1.10/Check { test: false }/TargetInner { ..: lib_target("text_to_ascii_art", ["lib"], "/Users/cfarrell/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/text-to-ascii-art-0.1.10/src/lib.rs", Edition2021) }
-   0.076144625s  INFO prepare_target{force=false package_id=text-to-ascii-art v0.1.10 target="text_to_ascii_art"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
-   0.076297458s  INFO prepare_target{force=false package_id=hello_world v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/hello_world) target="hello_world"}: cargo::core::compiler::fingerprint: fingerprint dirty for hello_world v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/hello_world)/Check { test: true }/TargetInner { name: "hello_world", doc: true, ..: with_path("/Users/cfarrell/Documents/rust-algorithms/hello_world/src/main.rs", Edition2024) }
-   0.076302333s  INFO prepare_target{force=false package_id=hello_world v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/hello_world) target="hello_world"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
-    Checking text-to-ascii-art v0.1.10
-    Checking hello_world v0.1.0 (/Users/cfarrell/Documents/rust-algorithms/hello_world)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.17s
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.07s
