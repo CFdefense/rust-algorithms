@@ -78,7 +78,7 @@ fn get_test_cases() -> Vec<(HashMap<u32, Vec<u32>>, u32, u32, Vec<u32>)> {
             5,
             vec![2, 1, 5],
         ),
-        // Test 6: Prof Johnson's sparse graph
+        // Test 6: Sparse graph test case
         (
             {
                 let mut adj = HashMap::new();

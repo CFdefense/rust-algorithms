@@ -165,7 +165,7 @@ impl Ord for OrderedFloat {
 ///         Creates a graph, selects a start and a goal, and then runs your A* function to determine a shortest path.
 ///
 fn main() {
-    // Define our locations - Marist College buildings with approximate coordinates
+    // Define our locations - campus buildings with approximate coordinates
     // Coordinates represent positions on campus (simplified 2D plane)
     let locations = vec![
         Location {
